@@ -21,16 +21,16 @@ Prevendo este comportamento, a carteira virtual Walleties visa oferecer maior co
 #### Uma pequena amostra interativa de como poderá vir a ser o produto final:
 > Web: https://xd.adobe.com/view/97c289b8-a7d4-498f-72f5-2d8e2e837220-e1f3/
 
-> Mobile: https://xd.adobe.com/view/cb9d266d-238d-413c-6d46-fd471b89e1ef-bdac/
+> Mobile: https://xd.adobe.com/view/cb9d266d-238d-413c-6d46-fd471b89e1ef-bdac/ (Não Atualizado)
 
 ## Instalação:
 #### Atualmente o Walleties está em status de desenvolvimento, para rodar o aplicativo será necessário: 
 1. Instalar nosso framework: https://flutter.dev/
 2. Clonar o projeto para seu editor de escolha:
 ```sh
-git clone https://github.com/Desannemada/Walleties.git
+git clone https://github.com/Desannemada/PI_Walleties.git
 ```
-3. Habilitar o Flutter Web (mais informações em: https://flutter.dev/docs/get-started/web):
+3. Habilitar o Flutter Web (Obs.: somente para a versão web, mais informações em: https://flutter.dev/docs/get-started/web):
 ```sh
 flutter channel beta
 flutter upgrade
@@ -46,7 +46,7 @@ flutter run
 ```
 
 ## Integrantes
-| <img src="/wreadme/renato.png" width="150">  | <img src="/wreadme/bruno.png" width="150">  | <img src="/wreadme/neto.png" width="150">  | <img src="/wreadme/anne.png" width="150"> |
+| <img src="/developers_profile/renato.png" width="150">  | <img src="/developers_profile/bruno.png" width="150">  | <img src="/developers_profile/neto.png" width="150">  | <img src="/developers_profile/anne.png" width="150"> |
 | :--------------------: | :--------------------: | :-----------------: | :-------------------:    |
 | **Renato Aquino**      | **Bruno Meira**        | **Antônio Pantoja** | **Anne Gonçalves**       |
 | Desenvolvedor Back-End | Cyber Security         | Gerente de Projeto  | Desenvolvedora Front-End |
