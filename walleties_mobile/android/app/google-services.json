@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "231174508831",
+    "firebase_url": "https://walleties-mobile.firebaseio.com",
+    "project_id": "walleties-mobile",
+    "storage_bucket": "walleties-mobile.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:231174508831:android:bd0bc6bc942f3eb6f5602a",
+        "android_client_info": {
+          "package_name": "com.example.walleties_mobile"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "231174508831-0vt12q7c9qqesgbtqbof0moq3t2uufgd.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.walleties_mobile",
+            "certificate_hash": "6a31750f462cd4581e3b4cc5cd815038362f4da7"
+          }
+        },
+        {
+          "client_id": "231174508831-k6agueb8ekd742ibiopp3ubh77lmdvke.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCeWbvzjyBpFrcHaoe-6-Te_ycC8XFLnpc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "231174508831-k6agueb8ekd742ibiopp3ubh77lmdvke.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
