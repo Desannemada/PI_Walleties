@@ -1,0 +1,95 @@
+name: walleties
+description: A new Flutter project.
+
+version: 1.0.0+1
+
+environment:
+  sdk: ">=2.1.0 <3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  provider: ^4.0.4
+  responsive_builder: ^0.1.5
+  firebase_auth: ^0.15.5+3
+  google_sign_in: ^4.2.0
+  cloud_firestore: ^0.13.4+2
+  firebase: ^7.3.0
+  http: ^0.12.1
+  
+  intl: ^0.16.1
+
+  # The following adds the Cupertino Icons font to your application.
+  # Use with the CupertinoIcons class for iOS style icons.
+  cupertino_icons: ^0.1.3
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+# For information on the generic Dart part of this file, see the
+# following page: https://dart.dev/tools/pub/pubspec
+
+# The following section is specific to Flutter.
+flutter:
+
+  # The following line ensures that the Material Icons font is
+  # included with your application, so that you can use the icons in
+  # the material Icons class.
+  uses-material-design: true
+
+  # To add assets to your application, add an assets section, like this:
+  assets:
+    - assets/
+    - assets/icons/
+
+  # An image asset can refer to one or more resolution-specific "variants", see
+  # https://flutter.dev/assets-and-images/#resolution-aware.
+
+  # For details regarding adding assets from package dependencies, see
+  # https://flutter.dev/assets-and-images/#from-packages
+
+  # To add custom fonts to your application, add a fonts section here,
+  # in this "flutter" section. Each entry in this list should have a
+  # "family" key with the font family name, and a "fonts" key with a
+  # list giving the asset and other descriptors for the font. For
+  # example:
+  fonts:
+    # - family: Bahnschrift
+    #   fonts:
+    #     - asset: assets/fonts/bahnschrift.ttf
+    # - family: Book Antiqua
+    #   fonts:
+    #     - asset: assets/fonts/book-antiqua.ttf
+    #     - asset: assets/fonts/book-antiqua-bold.ttf
+    #       weight: 700
+    # - family: Bookman Old Style
+    #   fonts:
+    #     - asset: assets/fonts/bookman-old-style.ttf
+    #     - asset: assets/fonts/bookman-old-style-bold.ttf
+    #       weight: 700
+    # - family: Century Ghotic
+    #   fonts:
+    #     - asset: assets/fonts/century-gothic.ttf
+    #     - asset: assets/fonts/century-gothic-bold.ttf
+    #       weight: 700
+    - family: Open Sans
+      fonts:
+        - asset: assets/fonts/open-sans/OpenSans-ExtraBold.ttf
+          weight: 800
+        - asset: assets/fonts/open-sans/OpenSans-Bold.ttf
+          weight: 700
+        - asset: assets/fonts/open-sans/OpenSans-Semibold.ttf
+          weight: 600
+        - asset: assets/fonts/open-sans/OpenSans-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/open-sans/OpenSans-Light.ttf
+          weight: 300
+
+    - family: MyFlutterApp
+      fonts:
+        - asset: assets/icons/MyFlutterApp.ttf
+        
+  #
+  # For details regarding fonts from package dependencies,
+  # see https://flutter.dev/custom-fonts/#from-packages
