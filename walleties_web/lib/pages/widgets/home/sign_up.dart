@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:provider/provider.dart';
+import 'package:walleties/colors/colors.dart';
 import 'package:walleties/model/firestore_model.dart';
 import 'package:walleties/model/main_view_model.dart';
 import 'package:walleties/pages/extra/custom_cursor.dart';
-import 'package:walleties/services/custom_api.dart';
 
 final FirebaseAuth _auth = FirebaseAuth.instance;
 
@@ -34,7 +34,7 @@ class _SignUpState extends State<SignUp> {
   @override
   Widget build(BuildContext context) {
     final model = Provider.of<MainViewModel>(context);
-    CustomAPI api = CustomAPI();
+    final fmodel = Provider.of<FirestoreModel>(context);
 
     return Form(
       key: _formKey,
@@ -152,10 +152,17 @@ class _SignUpState extends State<SignUp> {
                     bool result = await _register(
                         _emailController.text, _passwordController.text, model);
                     if (result) {
-                      _showSnackBar("Registro efetuado com sucesso!");
+                      // _showSnackBar("Registro efetuado com sucesso!");
+                      fmodel.updateUserInfo();
+                      fmodel.updateCurrentOption(0);
+                      model.updateisConfigDown(false);
+                      Navigator.pushNamed(context, "/Geral");
+                      showDialog(
+                        context: context,
+                        child: SignInDialog(),
+                      );
                     } else {
-                      _showSnackBar(
-                          "Algum erro ocorreu. Tente novamente mais tarde :(");
+                      _showSnackBar("Algum erro ocorreu. Tente novamente.");
                     }
                   }
                 },
@@ -208,6 +215,30 @@ class _SignUpState extends State<SignUp> {
         content: Text(text),
         behavior: SnackBarBehavior.floating,
       ),
+    );
+  }
+}
+
+class SignInDialog extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final fmodel = Provider.of<FirestoreModel>(context);
+
+    return AlertDialog(
+      title: Text("Bem-vindo ao Walleties!"),
+      content: Text("Registro efetuado com sucesso! \nOlá " +
+          fmodel.userInfo[0] +
+          ", você pode alterar seu perfil nas configurações."),
+      actions: [
+        FlatButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: Text(
+            "OK",
+            style: TextStyle(
+                color: darkGreen, fontSize: 20, fontWeight: FontWeight.bold),
+          ),
+        )
+      ],
     );
   }
 }

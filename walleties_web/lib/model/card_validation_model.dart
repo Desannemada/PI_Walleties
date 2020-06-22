@@ -26,10 +26,10 @@ class CardValidationModel with ChangeNotifier {
         _cvi[3].value != null &&
         _cvi[4].value != null &&
         _cvi[5].value != null) {
-      print("true");
+      print("Validation: Card is valid!");
       return true;
     } else {
-      print("false");
+      print("Validation: Card is not valid!");
       return false;
     }
   }

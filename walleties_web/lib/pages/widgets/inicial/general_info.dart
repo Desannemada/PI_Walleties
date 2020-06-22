@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:walleties/colors/colors.dart';
-import 'package:walleties/model/account_model.dart';
 import 'package:walleties/model/firestore_model.dart';
 import 'package:walleties/model/main_view_model.dart';
 import 'package:walleties/pages/extra/custom_cursor.dart';
@@ -54,12 +53,10 @@ class _GeneralInfoState extends State<GeneralInfo> {
                 children: <Widget>[
                   CustomCursor(
                     cursorStyle: CustomCursor.pointer,
-                    child: GestureDetector(
-                      child: Icon(
-                        Icons.arrow_back_ios,
-                        size: 50,
-                      ),
-                      onTap: () {
+                    child: IconButton(
+                      padding: EdgeInsets.zero,
+                      icon: Icon(Icons.arrow_back_ios, size: 50),
+                      onPressed: () {
                         setState(
                           () {
                             if (currentIndex - 1 >= 0) {
@@ -113,16 +110,20 @@ class _GeneralInfoState extends State<GeneralInfo> {
                               );
                             },
                           )
-                        : Text("Sem cartões"),
+                        : Text(
+                            "Sem cartões cadastrados",
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
                   ),
                   CustomCursor(
                     cursorStyle: CustomCursor.pointer,
-                    child: GestureDetector(
-                      child: Icon(
-                        Icons.arrow_forward_ios,
-                        size: 50,
-                      ),
-                      onTap: () {
+                    child: IconButton(
+                      padding: EdgeInsets.zero,
+                      icon: Icon(Icons.arrow_forward_ios, size: 50),
+                      onPressed: () {
                         setState(() {
                           if (currentIndex + 1 < fmodel.userCards.length) {
                             currentIndex = currentIndex + 1;
@@ -167,28 +168,24 @@ class GeneralCards extends StatelessWidget {
     final fmodel = Provider.of<FirestoreModel>(context);
     final model = Provider.of<MainViewModel>(context);
 
-    String getPath(int i, int index) {
+    String getSingular(int i, int index) {
       double result = 0;
       if (index == 0) {
         result = double.parse(
             fmodel.userCards[i][8].replaceAll('.', '').replaceAll(',', '.'));
       } else if (index == 1) {
-        result = double.parse(fmodel.userCards[i][9]
-                .replaceAll('.', '')
-                .replaceAll(',', '.')) -
-            double.parse(fmodel.userCards[i][8]
+        for (var compra in fmodel.faturaCredito) {
+          if (compra['name_bank'] == fmodel.getOptions(i + 1)[1]) {
+            result = result +
+                double.parse(
+                    compra['valor'].replaceAll('.', '').replaceAll(',', '.'));
+          }
+        }
+      } else if (index == 2) {
+        result = result +
+            double.parse(fmodel.userCards[i][9]
                 .replaceAll('.', '')
                 .replaceAll(',', '.'));
-      } else if (index == 2) {
-        result = double.parse(fmodel.userCards[i][9]
-                .replaceAll('.', '')
-                .replaceAll(',', '.')) -
-            (double.parse(fmodel.userCards[i][9]
-                    .replaceAll('.', '')
-                    .replaceAll(',', '.')) -
-                double.parse(fmodel.userCards[i][8]
-                    .replaceAll('.', '')
-                    .replaceAll(',', '.')));
       }
       return NumberFormat.currency(locale: "pt_br", symbol: 'R\$ ')
           .format(result);
@@ -197,27 +194,24 @@ class GeneralCards extends StatelessWidget {
     String getTotal(int index) {
       double result = 0;
       if (index == 0) {
-        for (var card in fmodel.userCards) {
+        for (var card = 0; card < fmodel.userCards.length; card++) {
           result = result +
               double.parse(
-                fmodel.userCards[index][8]
+                fmodel.userCards[card][8]
                     .replaceAll('.', '')
                     .replaceAll(',', '.'),
               );
         }
       } else if (index == 1) {
-        for (var card in fmodel.userCards) {
+        for (var compra in fmodel.faturaCredito) {
           result = result +
-              double.parse(card[9].replaceAll('.', '').replaceAll(',', '.')) -
-              double.parse(card[8].replaceAll('.', '').replaceAll(',', '.'));
+              double.parse(
+                  compra['valor'].replaceAll('.', '').replaceAll(',', '.'));
         }
       } else if (index == 2) {
         for (var card in fmodel.userCards) {
           result = result +
-              double.parse(card[9].replaceAll('.', '').replaceAll(',', '.')) -
-              (double.parse(card[9].replaceAll('.', '').replaceAll(',', '.')) -
-                  double.parse(
-                      card[8].replaceAll('.', '').replaceAll(',', '.')));
+              double.parse(card[9].replaceAll('.', '').replaceAll(',', '.'));
         }
       }
       return NumberFormat.currency(locale: "pt_br", symbol: 'R\$ ')
@@ -226,7 +220,7 @@ class GeneralCards extends StatelessWidget {
 
     double barSize(int index, int i) {
       double result;
-      result = double.parse(getPath(i, index)
+      result = double.parse(getSingular(i, index)
               .substring(3)
               .replaceAll('.', '')
               .replaceAll(',', '.')) /
@@ -304,7 +298,7 @@ class GeneralCards extends StatelessWidget {
                                     ),
                                     GeralTexts(
                                       fontSize: 22,
-                                      text: getPath(i, index),
+                                      text: getSingular(i, index),
                                       color: fmodel.getOptions(i + 1)[2],
                                     ),
                                   ],

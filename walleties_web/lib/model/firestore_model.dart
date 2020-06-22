@@ -1,8 +1,6 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:http/http.dart';
 import 'package:intl/intl.dart';
 import 'package:walleties/colors/colors.dart';
 import 'package:walleties/pages/extra/my_flutter_app_icons.dart';
@@ -46,6 +44,10 @@ class FirestoreModel with ChangeNotifier {
         return bancodobrasil;
       case "Inter":
         return inter;
+      case "Bradesco":
+        return bradesco;
+      case "Santander":
+        return santander;
       case "Geral":
         return yellow;
       case "Configurações":
@@ -64,7 +66,7 @@ class FirestoreModel with ChangeNotifier {
   List get currentOption => _currentOption;
 
   void updateCurrentOption(int i) {
-    print(i);
+    // print(i);
     _currentOption = [
       i,
       _options[i][1],
@@ -110,25 +112,34 @@ class FirestoreModel with ChangeNotifier {
   // List<dynamic> _faturas;
 
   void getUserContas() async {
+    print("Getting User Cards Info");
     resetCards();
     var contas = await api.getCardsInfo(userInfo[1]);
-    print(contas);
-    for (var item in contas) {
-      updateOptions(item['name_bank']);
-      updateUserCards([
-        item['name'],
-        item['numero'],
-        item['venc'],
-        item['cvv'],
-        item['name_bank'],
-        item['agencia'],
-        item['conta'],
-        item['_id'],
-        item['saldo'],
-        item['limite'],
-      ]);
+    print("CONTAS ->> " + contas.toString());
+    if (contas != null) {
+      for (var item in contas) {
+        updateOptions(item['name_bank']);
+        updateUserCards([
+          item['name'],
+          item['numero'],
+          item['venc'],
+          item['cvv'],
+          item['name_bank'],
+          item['agencia'],
+          item['conta'],
+          item['_id'],
+          item['saldo'],
+          item['limite'],
+        ]);
+      }
+      // print(userCards);
+      getCredito();
+      getDebito();
+      updateUserContas(contas.length);
+    } else {
+      updateUserContas(0);
     }
-    updateUserContas(contas.length);
+
     // var fatura = await api.getFatura(userInfo[1]);
 
     // DocumentReference documentReference =
@@ -169,15 +180,15 @@ class FirestoreModel with ChangeNotifier {
     //   print("Erro");
     // });
     if (userCards.isEmpty) {
-      print("hey");
+      print("AddCard: Trying to add new user");
       var res = await api.addNewUser(data);
       if (res.statusCode == 400) {
-        print("uh");
+        print("AddCard: Error new user, trying new card");
         await api.addNewCard(data);
       }
       getUserContas();
     } else {
-      print("hi");
+      print("AddCard: Trying to add new card");
       await api.addNewCard(data);
       getUserContas();
     }
@@ -200,16 +211,75 @@ class FirestoreModel with ChangeNotifier {
     }
   }
 
+  List faturaDebito = [];
+
+  void getDebito() async {
+    faturaDebito = await api.getFaturaDebito(userInfo[1]);
+    notifyListeners();
+
+    print("\nFATURA-DEBITO: " + faturaDebito.toString() + "\n");
+  }
+
+  List faturaCredito = [];
+
+  void getCredito() async {
+    faturaCredito = await api.getFaturaCredito(userInfo[1]);
+    // print(faturaCredito);
+
+    notifyListeners();
+
+    print("\nFATURA-CREDITO: " + faturaCredito.toString() + "\n");
+  }
+
+  void ops_dep_pag(double valor, int index) async {
+    List<String> data = [
+      userInfo[1],
+      userCards[currentOption[0] - 1][0],
+      userCards[currentOption[0] - 1][1],
+      userCards[currentOption[0] - 1][2],
+      userCards[currentOption[0] - 1][3],
+      userCards[currentOption[0] - 1][4],
+      userCards[currentOption[0] - 1][5],
+      userCards[currentOption[0] - 1][6],
+      index == 0
+          ? NumberFormat.currency(
+                  locale: "pt_br", symbol: '', customPattern: "")
+              .format(double.parse(userCards[currentOption[0] - 1][8]
+                      .replaceAll('.', '')
+                      .replaceAll(',', '.')) +
+                  valor)
+          : NumberFormat.currency(
+                  locale: "pt_br", symbol: '', customPattern: "")
+              .format(double.parse(userCards[currentOption[0] - 1][8]
+                      .replaceAll('.', '')
+                      .replaceAll(',', '.')) -
+                  valor),
+      userCards[currentOption[0] - 1][7]
+    ];
+
+    List<String> opdata = [
+      currentOption[1],
+      index == 0 ? "Depósito" : "Pagamento",
+      NumberFormat.currency(locale: "pt_br", symbol: '', customPattern: "")
+          .format(double.parse(
+              valor.toString().replaceAll('.', '').replaceAll(',', '.')))
+          .toString()
+    ];
+
+    var aux = await api.dep_pag(data, opdata);
+  }
+
   List userInfo = [
     "Username",
     "usuario@gmail.com",
     "userId",
-    "",
+    "assets/profileImage.jpg",
   ];
 
   void updateUserInfo() async {
     FirebaseUser user = await FirebaseAuth.instance.currentUser();
     if (user != null) {
+      print("Updating User Info...");
       List aux = [
         user.displayName == null ? "Username" : user.displayName,
         user.email != null ? user.email : "usuario@gmail.com",
@@ -218,13 +288,14 @@ class FirestoreModel with ChangeNotifier {
             ? user.photoUrl
                 .replaceAll("s96-c/photo.jpg", "photo.jpg")
                 .replaceAll("=s96-c", "")
-            : ""
+            : "assets/profileImage.jpg"
       ];
       updateInfo(aux);
       resetCards();
       getUserContas();
+    } else {
+      print("Error: Updating User Info...");
     }
-    print("oi");
   }
 
   String _currentImage;
@@ -237,7 +308,6 @@ class FirestoreModel with ChangeNotifier {
   }
 
   void updateInfo(List aux) {
-    print("ah");
     userInfo = aux;
     _currentImage = userInfo[3];
     notifyListeners();
@@ -269,30 +339,8 @@ class FirestoreModel with ChangeNotifier {
   CustomAPI api = CustomAPI();
   int errorResponse = 0;
 
-  // Future<List<dynamic>> getInfo() async {
-  //   print(await api.getCardsInfo("anne.eleven@hotmail.com"));
-  //   print(await api.getFatura("anne.eleven@hotmail.com"));
-  // }
-
-  // Future<List<dynamic>> addNewUser(int id) async {
-  //   var res = await api.addNewUser(id);
-  //   print(res);
-  //   return res;
-  // }
-
   FirestoreModel() {
     print("Iniciando FirestoreModel...");
-    // api.addNewCard([
-    //   "anne.eleven@hotmail.com",
-    //   "Fulano Sicrano Beltrano",
-    //   "3333.3333.3333.3555",
-    //   "31/94",
-    //   "999",
-    //   "Nubank",
-    //   "1111-1",
-    //   "11.111-1"
-    // ]);
     updateUserInfo();
-    print(userCards);
   }
 }

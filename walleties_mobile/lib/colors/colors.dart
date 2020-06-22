@@ -12,3 +12,5 @@ const darkBlue = Color(0xFF0061AA);
 const bancodobrasil = Color(0xFF225198);
 const nubank = Color(0xFF8A05BE);
 const inter = Color(0xFFFF7A00);
+const santander = Color(0xFFEA0000);
+const bradesco = Color(0xFFCC092F);

@@ -41,7 +41,12 @@ class InicialAppBar extends StatelessWidget {
                   cursorStyle: CustomCursor.pointer,
                   child: IconButton(
                     icon: Icon(Icons.menu),
-                    onPressed: () => model.updateIsDrawerOpen(),
+                    onPressed: () {
+                      if (!model.isDrawerOpen) {
+                        model.updateisConfigDown(false);
+                      }
+                      model.updateIsDrawerOpen();
+                    },
                   ),
                 ),
                 SizedBox(width: 10),

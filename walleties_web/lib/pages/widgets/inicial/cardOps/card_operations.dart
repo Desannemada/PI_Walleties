@@ -54,9 +54,19 @@ class _CardOperationsState extends State<CardOperations> {
           child: ListView(
             shrinkWrap: true,
             children: [
-              Text(
-                options[widget.index],
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    options[widget.index],
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                  ),
+                  IconButton(
+                    padding: EdgeInsets.zero,
+                    icon: Icon(Icons.close),
+                    onPressed: () => Navigator.of(context).pop(),
+                  ),
+                ],
               ),
               widget.index == 0
                   ? OpDeposito(controllers[widget.index])
@@ -67,16 +77,27 @@ class _CardOperationsState extends State<CardOperations> {
                           : widget.index == 3
                               ? OpCobrar(controllers[widget.index])
                               : Container(),
-              SendButton(),
+              SendButton(
+                index: widget.index,
+                controller: controllers[widget.index],
+              ),
             ],
           ),
         ),
       ),
     );
   }
+}
 
-  Widget SendButton() {
-    final List options = ["Depositar", "Pagar", "Transferir", "Cobrar"];
+class SendButton extends StatelessWidget {
+  final List options = ["Depositar", "Pagar", "Transferir", "Cobrar"];
+  final int index;
+  final List<TextEditingController> controller;
+
+  SendButton({@required this.index, @required this.controller});
+  @override
+  Widget build(BuildContext context) {
+    final fmodel = Provider.of<FirestoreModel>(context);
 
     return Align(
       alignment: Alignment.center,
@@ -87,13 +108,19 @@ class _CardOperationsState extends State<CardOperations> {
           child: RaisedButton(
             color: Colors.blue,
             child: Text(
-              options[widget.index],
+              options[index],
               style: TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.bold,
               ),
             ),
-            onPressed: () {},
+            onPressed: () {
+              if (index == 0) {
+                fmodel.ops_dep_pag(double.parse(controller[0].text), 0);
+              } else if (index == 1) {
+                fmodel.ops_dep_pag(double.parse(controller[0].text), 1);
+              }
+            },
           ),
         ),
       ),

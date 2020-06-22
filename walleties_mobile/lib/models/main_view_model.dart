@@ -139,6 +139,10 @@ class MainViewModel with ChangeNotifier {
         return bancodobrasil;
       case "Inter":
         return inter;
+      case "Bradesco":
+        return bradesco;
+      case "Santander":
+        return santander;
       case "Geral":
         return yellow;
       case "Configurações":

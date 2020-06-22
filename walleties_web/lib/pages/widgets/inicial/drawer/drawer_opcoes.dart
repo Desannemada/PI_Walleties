@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:walleties/model/account_model.dart';
 import 'package:walleties/model/firestore_model.dart';
 import 'package:walleties/model/main_view_model.dart';
 import 'package:walleties/pages/extra/custom_cursor.dart';
 import 'package:walleties/pages/widgets/inicial/drawer/edit_profile.dart';
-import 'package:walleties/pages/widgets/inicial/drawer/profile.dart';
 
 class DrawerOptions extends StatefulWidget {
   final bool type;
@@ -56,7 +54,7 @@ class _DrawerOptionsState extends State<DrawerOptions> {
                     ),
                     onPressed: () {
                       if (index == fmodel.options.length - 1) {
-                        model.updateisConfigDown();
+                        model.updateisConfigDown(!model.isConfigDown);
                       } else {
                         fmodel.updateCurrentOption(index);
                         if (index != 0) {

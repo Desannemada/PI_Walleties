@@ -31,8 +31,8 @@ class MainViewModel with ChangeNotifier {
 
   bool _isConfigDown = false;
   bool get isConfigDown => _isConfigDown;
-  updateisConfigDown() {
-    _isConfigDown = !_isConfigDown;
+  updateisConfigDown(bool aux) {
+    _isConfigDown = aux;
     notifyListeners();
   }
 

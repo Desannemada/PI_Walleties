@@ -56,10 +56,10 @@ class MainScreen extends StatelessWidget {
       stream: FirebaseAuth.instance.onAuthStateChanged,
       builder: (context, AsyncSnapshot<FirebaseUser> snapshot) {
         if ((!snapshot.hasData || snapshot.data == null)) {
-          print("dont have data");
+          print("Iniciando Tela de Login...");
           return HomePage();
         }
-        print("hasdata");
+        print("Iniciando Tela de Menu...");
         return InicialPage();
       },
     );

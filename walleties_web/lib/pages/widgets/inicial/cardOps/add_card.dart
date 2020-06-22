@@ -110,13 +110,13 @@ class _AddCardState extends State<AddCard> {
                   AddCardField(
                     controller: _agenciaController,
                     label: "Agência",
-                    hint: "a",
+                    hint: "1234-5",
                     index: 4,
                   ),
                   AddCardField(
                     controller: _contaController,
                     label: "Conta",
-                    hint: "a",
+                    hint: "12346578-9",
                     index: 5,
                   ),
                 ],
