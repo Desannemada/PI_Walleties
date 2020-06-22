@@ -65,6 +65,7 @@ class CardManager extends StatelessWidget {
                                   children: [
                                     Icon(
                                       MyFlutterApp.pay,
+                                      color: model.getOptions(index)[2],
                                       size: 40,
                                     ),
                                     SizedBox(width: 15),
@@ -81,7 +82,7 @@ class CardManager extends StatelessWidget {
                                 IconButton(
                                   icon: Icon(Icons.delete),
                                   onPressed: () async {
-                                    var res = await model.deleteCard(index);
+                                    var res = await model.deleteCard(index - 1);
                                     showDialog(
                                         context: context,
                                         builder: (context) {

@@ -175,7 +175,7 @@ class GeneralCards extends StatelessWidget {
             fmodel.userCards[i][8].replaceAll('.', '').replaceAll(',', '.'));
       } else if (index == 1) {
         for (var compra in fmodel.faturaCredito) {
-          if (compra['name_bank'] == fmodel.getOptions(i + 1)[1]) {
+          if (compra['name_bank'] == fmodel.userCards[i][4]) {
             result = result +
                 double.parse(
                     compra['valor'].replaceAll('.', '').replaceAll(',', '.'));

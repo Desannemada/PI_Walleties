@@ -86,7 +86,6 @@ class FirestoreModel with ChangeNotifier {
       [MyFlutterApp.cog_1, "Configurações"]
     ];
     _userCards = [];
-    notifyListeners();
   }
 
   void updateOptions(String option) {
@@ -114,6 +113,7 @@ class FirestoreModel with ChangeNotifier {
   void getUserContas() async {
     print("Getting User Cards Info");
     resetCards();
+
     var contas = await api.getCardsInfo(userInfo[1]);
     print("CONTAS ->> " + contas.toString());
     if (contas != null) {
@@ -158,8 +158,8 @@ class FirestoreModel with ChangeNotifier {
     // });
   }
 
-  void addCard(String nome, String numeroCartao, String validade, String cvv,
-      String banco, String agencia, String conta) async {
+  Future<bool> addCard(String nome, String numeroCartao, String validade,
+      String cvv, String banco, String agencia, String conta) async {
     List<String> data = [
       userInfo[1],
       nome,
@@ -184,17 +184,29 @@ class FirestoreModel with ChangeNotifier {
       var res = await api.addNewUser(data);
       if (res.statusCode == 400) {
         print("AddCard: Error new user, trying new card");
-        await api.addNewCard(data);
+        var res2 = await api.addNewCard(data);
+        if (res2.statusCode == 200 || res2.statusCode == 201) {
+          return true;
+        } else {
+          return false;
+        }
+      } else if (res.statusCode == 200 || res.statusCode == 201) {
+        getUserContas();
+        return true;
       }
-      getUserContas();
     } else {
       print("AddCard: Trying to add new card");
-      await api.addNewCard(data);
-      getUserContas();
+      var res3 = await api.addNewCard(data);
+      if (res3.statusCode == 200 || res3.statusCode == 201) {
+        getUserContas();
+        return true;
+      } else {
+        return false;
+      }
     }
   }
 
-  void deleteCard(int index) async {
+  Future<bool> deleteCard(int index) async {
     // Firestore.instance.collection('usuarios').document(userInfo[2]).updateData(
     //     {userCards[index][1]: FieldValue.delete()}).whenComplete(() {
     //   print("Deletado");
@@ -206,8 +218,10 @@ class FirestoreModel with ChangeNotifier {
       print("Deletado");
       resetCards();
       getUserContas();
+      return true;
     } else {
       print("Erro ao deletar");
+      return false;
     }
   }
 
@@ -215,6 +229,7 @@ class FirestoreModel with ChangeNotifier {
 
   void getDebito() async {
     faturaDebito = await api.getFaturaDebito(userInfo[1]);
+    faturaDebito = faturaDebito.reversed.toList();
     notifyListeners();
 
     print("\nFATURA-DEBITO: " + faturaDebito.toString() + "\n");
@@ -224,14 +239,15 @@ class FirestoreModel with ChangeNotifier {
 
   void getCredito() async {
     faturaCredito = await api.getFaturaCredito(userInfo[1]);
-    // print(faturaCredito);
+    faturaCredito = faturaCredito.reversed.toList();
 
     notifyListeners();
-
+    var a = faturaCredito.reversed.toList();
     print("\nFATURA-CREDITO: " + faturaCredito.toString() + "\n");
+    // print("\nFATURA-CREDITO2: " + a.toString() + "\n");
   }
 
-  void ops_dep_pag(double valor, int index) async {
+  Future<bool> ops_dep_pag(double valor, int index) async {
     List<String> data = [
       userInfo[1],
       userCards[currentOption[0] - 1][0],
@@ -266,7 +282,12 @@ class FirestoreModel with ChangeNotifier {
           .toString()
     ];
 
-    var aux = await api.dep_pag(data, opdata);
+    var response = await api.dep_pag(data, opdata);
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      return true;
+    } else {
+      return false;
+    }
   }
 
   List userInfo = [
@@ -291,7 +312,7 @@ class FirestoreModel with ChangeNotifier {
             : "assets/profileImage.jpg"
       ];
       updateInfo(aux);
-      resetCards();
+      // resetCards();
       getUserContas();
     } else {
       print("Error: Updating User Info...");

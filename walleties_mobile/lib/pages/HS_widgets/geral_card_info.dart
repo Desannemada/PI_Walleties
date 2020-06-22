@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:walleties_mobile/colors/colors.dart';
 import 'package:walleties_mobile/models/main_view_model.dart';
@@ -15,6 +16,28 @@ class _GeralCardInfoState extends State<GeralCardInfo> {
   @override
   Widget build(BuildContext context) {
     final model = Provider.of<MainViewModel>(context);
+
+    String getSingular(int i, int index) {
+      double result = 0;
+      if (index == 0) {
+        result = double.parse(
+            model.userCards[i][8].replaceAll('.', '').replaceAll(',', '.'));
+      } else if (index == 1) {
+        for (var compra in model.faturaCredito) {
+          if (compra['name_bank'] == model.userCards[i][4]) {
+            result = result +
+                double.parse(
+                    compra['valor'].replaceAll('.', '').replaceAll(',', '.'));
+          }
+        }
+      } else if (index == 2) {
+        result = result +
+            double.parse(
+                model.userCards[i][9].replaceAll('.', '').replaceAll(',', '.'));
+      }
+      return NumberFormat.currency(locale: "pt_br", symbol: 'R\$ ')
+          .format(result);
+    }
 
     return GestureDetector(
       onTap: () {
@@ -73,7 +96,10 @@ class _GeralCardInfoState extends State<GeralCardInfo> {
                         ),
                       ),
                       InfoTexts(
-                        text: "Quantia aqui",
+                        text: !model.whichAbaFatura
+                            ? getSingular(model.currentOption[0] - 1, index)
+                            : getSingular(
+                                model.currentOption[0] - 1, index + 1),
                         hover: true,
                         size: 18,
                         weight: FontWeight.w600,

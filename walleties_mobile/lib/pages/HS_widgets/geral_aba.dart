@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:walleties_mobile/colors/colors.dart';
 // import 'package:walleties_mobile/models/account_model.dart';
 import 'package:walleties_mobile/models/main_view_model.dart';
+import 'package:walleties_mobile/pages/HS_widgets/digi_ops.dart';
 
 class AbaGeral extends StatelessWidget {
   @override
@@ -77,7 +79,24 @@ class AbaGeral extends StatelessWidget {
                       fontSize: 16,
                     ),
                   ),
-                  onPressed: () {},
+                  onPressed: () {
+                    if (index == 0) {
+                      model.updateShowQRCode(false);
+                      model.updateInfoQRCode("");
+                      model.updateChooseCobCard(0);
+                    } else {
+                      model.updateInfogetQRCode([]);
+                    }
+                    model.updateChecks();
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) {
+                          return DigiOps(index);
+                        },
+                      ),
+                    );
+                  },
                 ),
               ),
             ),
@@ -118,8 +137,56 @@ class GeralCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // final amodel = Provider.of<AccountModel>(context);
     final model = Provider.of<MainViewModel>(context);
+
+    String getSingular(int i, int index) {
+      double result = 0;
+      if (index == 2) {
+        result = double.parse(
+            model.userCards[i][8].replaceAll('.', '').replaceAll(',', '.'));
+      } else if (index == 0) {
+        for (var compra in model.faturaCredito) {
+          if (compra['name_bank'] == model.userCards[i][4]) {
+            result = result +
+                double.parse(
+                    compra['valor'].replaceAll('.', '').replaceAll(',', '.'));
+          }
+        }
+      } else if (index == 1) {
+        result = result +
+            double.parse(
+                model.userCards[i][9].replaceAll('.', '').replaceAll(',', '.'));
+      }
+      return NumberFormat.currency(locale: "pt_br", symbol: 'R\$ ')
+          .format(result);
+    }
+
+    String getTotal(int index) {
+      double result = 0;
+      if (index == 2) {
+        for (var card = 0; card < model.userCards.length; card++) {
+          result = result +
+              double.parse(
+                model.userCards[card][8]
+                    .replaceAll('.', '')
+                    .replaceAll(',', '.'),
+              );
+        }
+      } else if (index == 0) {
+        for (var compra in model.faturaCredito) {
+          result = result +
+              double.parse(
+                  compra['valor'].replaceAll('.', '').replaceAll(',', '.'));
+        }
+      } else if (index == 1) {
+        for (var card in model.userCards) {
+          result = result +
+              double.parse(card[9].replaceAll('.', '').replaceAll(',', '.'));
+        }
+      }
+      return NumberFormat.currency(locale: "pt_br", symbol: 'R\$ ')
+          .format(result);
+    }
 
     return Container(
       height: double.infinity,
@@ -150,7 +217,7 @@ class GeralCard extends StatelessWidget {
                   ? Column(
                       children: List.generate(
                         model.userCards.length,
-                        (index) => Row(
+                        (i) => Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Container(
@@ -159,10 +226,10 @@ class GeralCard extends StatelessWidget {
                               width: 45,
                               child: Card(
                                 shape: CircleBorder(),
-                                color: model.getOptions(index + 1)[2],
+                                color: model.getOptions(i + 1)[2],
                                 child: Center(
                                   child: Text(
-                                    model.getOptions(index + 1)[1][0],
+                                    model.getOptions(i + 1)[1][0],
                                     style: TextStyle(
                                       color: Colors.white,
                                       fontSize: 22,
@@ -176,17 +243,30 @@ class GeralCard extends StatelessWidget {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(
-                                    "Quantia aqui",
-                                    style: TextStyle(
-                                      color: model.getOptions(index + 1)[2],
-                                      fontSize: 16,
-                                    ),
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        model.getOptions(i + 1)[1],
+                                        style: TextStyle(
+                                          color: model.getOptions(i + 1)[2],
+                                          fontSize: 16,
+                                        ),
+                                      ),
+                                      Text(
+                                        getSingular(i, index),
+                                        style: TextStyle(
+                                          color: model.getOptions(i + 1)[2],
+                                          fontSize: 16,
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                   SizedBox(height: 3),
                                   Container(
                                     height: 10,
-                                    color: model.getOptions(index + 1)[2],
+                                    color: model.getOptions(i + 1)[2],
                                   ),
                                 ],
                               ),

@@ -2,20 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'package:walleties/model/firestore_model.dart';
-import 'package:walleties/model/main_view_model.dart';
-import 'package:walleties/pages/extra/custom_cursor.dart';
+import 'package:walleties_mobile/models/main_view_model.dart';
 
-class CardOperations extends StatefulWidget {
+class Operacoes extends StatefulWidget {
   final index;
-
-  CardOperations({@required this.index});
+  Operacoes(this.index);
 
   @override
-  _CardOperationsState createState() => _CardOperationsState();
+  _OperacoesState createState() => _OperacoesState();
 }
 
-class _CardOperationsState extends State<CardOperations> {
+class _OperacoesState extends State<Operacoes> {
+  final List titles = ["Depósito", "Pagamento", "Transferência", "Cobrança"];
   final _formKey = GlobalKey<FormState>();
 
   TextEditingController _nomeController;
@@ -43,33 +41,31 @@ class _CardOperationsState extends State<CardOperations> {
     ];
   }
 
-  List options = ["Depósito", "Pagamento", "Transferência", "Cobrar"];
-
   @override
   Widget build(BuildContext context) {
-    return Dialog(
-      child: Container(
-        padding: EdgeInsets.all(20),
-        width: 450,
+    final model = Provider.of<MainViewModel>(context);
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          color: model.currentOption[2],
+          onPressed: () => Navigator.of(context).pop(),
+        ),
+        title: Text(
+          titles[widget.index],
+          style: TextStyle(
+            color: model.currentOption[2],
+          ),
+        ),
+      ),
+      body: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 15),
         child: Form(
           key: _formKey,
           child: ListView(
             shrinkWrap: true,
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    options[widget.index],
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-                  ),
-                  IconButton(
-                    padding: EdgeInsets.zero,
-                    icon: Icon(Icons.close),
-                    onPressed: () => Navigator.of(context).pop(),
-                  ),
-                ],
-              ),
               widget.index == 0
                   ? OpDeposito(controllers[widget.index])
                   : widget.index == 1
@@ -99,48 +95,45 @@ class SendButton extends StatelessWidget {
   SendButton({@required this.index, @required this.controller});
   @override
   Widget build(BuildContext context) {
-    final fmodel = Provider.of<FirestoreModel>(context);
+    final model = Provider.of<MainViewModel>(context);
 
     return Align(
       alignment: Alignment.center,
-      child: CustomCursor(
-        cursorStyle: CustomCursor.pointer,
-        child: Padding(
-          padding: EdgeInsets.only(top: 15),
-          child: RaisedButton(
-            color: Colors.blue,
-            child: Text(
-              options[index],
-              style: TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-              ),
+      child: Padding(
+        padding: EdgeInsets.only(top: 15),
+        child: RaisedButton(
+          color: Colors.blue,
+          child: Text(
+            options[index],
+            style: TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
             ),
-            onPressed: () async {
-              var res;
-              var text = double.parse(
-                  controller[0].text.replaceAll('.', '').replaceAll(',', '.'));
-              if (index == 0) {
-                res = await fmodel.ops_dep_pag(text, 0);
-                if (res) {
-                  Navigator.of(context).pop();
-                  fmodel.getUserContas();
-                  showDialog(context: context, child: OpDialog(text, 0));
-                } else {
-                  showDialog(context: context, child: OpDialog(text, 2));
-                }
-              } else if (index == 1) {
-                res = await fmodel.ops_dep_pag(text, 1);
-                if (res) {
-                  Navigator.of(context).pop();
-                  fmodel.getUserContas();
-                  showDialog(context: context, child: OpDialog(text, 1));
-                } else {
-                  showDialog(context: context, child: OpDialog(text, 2));
-                }
-              }
-            },
           ),
+          onPressed: () async {
+            var res;
+            var text = double.parse(
+                controller[0].text.replaceAll('.', '').replaceAll(',', '.'));
+            if (index == 0) {
+              res = await model.ops_dep_pag(text, 0);
+              if (res) {
+                model.getUserContas();
+                Navigator.of(context).pop();
+                showDialog(context: context, child: OpDialog(text, 0));
+              } else {
+                showDialog(context: context, child: OpDialog(text, 2));
+              }
+            } else if (index == 1) {
+              res = await model.ops_dep_pag(text, 1);
+              if (res) {
+                model.getUserContas();
+                Navigator.of(context).pop();
+                showDialog(context: context, child: OpDialog(text, 1));
+              } else {
+                showDialog(context: context, child: OpDialog(text, 2));
+              }
+            }
+          },
         ),
       ),
     );
@@ -170,19 +163,16 @@ class OpDialog extends StatelessWidget {
       title: Text(type != 2 ? "Operação Concluída!" : "Operação Falhou."),
       content: Text(getText()),
       actions: [
-        CustomCursor(
-          cursorStyle: CustomCursor.pointer,
-          child: RaisedButton(
-            child: Text(
-              "OK",
-              style: TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-              ),
+        RaisedButton(
+          child: Text(
+            "OK",
+            style: TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
             ),
-            color: Colors.blue,
-            onPressed: () => Navigator.of(context).pop(),
           ),
+          color: Colors.blue,
+          onPressed: () => Navigator.of(context).pop(),
         ),
       ],
     );
@@ -256,13 +246,12 @@ class OpTransferencia extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final model = Provider.of<MainViewModel>(context);
-    final fmodel = Provider.of<FirestoreModel>(context);
     return ListView(
       shrinkWrap: true,
       physics: NeverScrollableScrollPhysics(),
       children: [
         DropDownBanco(),
-        model.chosenBankT == fmodel.currentOption[1]
+        model.chosenBankT == model.currentOption[1]
             ? Container()
             : ListView(
                 shrinkWrap: true,
@@ -312,25 +301,22 @@ class AddCardField extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: EdgeInsets.only(top: 15),
-      child: CustomCursor(
-        cursorStyle: CustomCursor.text,
-        child: TextFormField(
-          controller: _controller,
-          inputFormatters: <TextInputFormatter>[
-            _label == "Valor"
-                ? WhitelistingTextInputFormatter(RegExp("[0-9,]"))
-                : _label == "Código de Barras"
-                    ? WhitelistingTextInputFormatter(RegExp("[0-9. ]"))
-                    : BlacklistingTextInputFormatter(RegExp("[,.]")),
-          ],
-          decoration: InputDecoration(
-            hintText: _hint,
-            labelText: _label,
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(5),
-            ),
-            contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: 10),
+      child: TextFormField(
+        controller: _controller,
+        inputFormatters: <TextInputFormatter>[
+          _label == "Valor"
+              ? WhitelistingTextInputFormatter(RegExp("[0-9,]"))
+              : _label == "Código de Barras"
+                  ? WhitelistingTextInputFormatter(RegExp("[0-9. ]"))
+                  : BlacklistingTextInputFormatter(RegExp("[,.]")),
+        ],
+        decoration: InputDecoration(
+          hintText: _hint,
+          labelText: _label,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(5),
           ),
+          contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: 10),
         ),
       ),
     );
@@ -357,22 +343,19 @@ class _DropDownBancoState extends State<DropDownBanco> {
           contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: 10),
           labelText: "Banco",
         ),
-        child: CustomCursor(
-          cursorStyle: CustomCursor.pointer,
-          child: DropdownButtonHideUnderline(
-            child: DropdownButton<String>(
-              value: model.chosenBankT,
-              isDense: true,
-              onChanged: (String newValue) {
-                model.updateChosenBankT(newValue);
-              },
-              items: model.banks.map((String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(value),
-                );
-              }).toList(),
-            ),
+        child: DropdownButtonHideUnderline(
+          child: DropdownButton<String>(
+            value: model.chosenBankT,
+            isDense: true,
+            onChanged: (String newValue) {
+              model.updateChosenBankT(newValue);
+            },
+            items: model.banks.map((String value) {
+              return DropdownMenuItem<String>(
+                value: value,
+                child: Text(value),
+              );
+            }).toList(),
           ),
         ),
       ),

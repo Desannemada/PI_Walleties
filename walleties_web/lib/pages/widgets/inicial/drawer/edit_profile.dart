@@ -225,45 +225,46 @@ class _EditProfileState extends State<EditProfile> {
                   // print(image.toString());
                   fmodel.updateUserPhotoURL(image.toString());
                   showDialog(
-                      context: context,
-                      child: Dialog(
-                        child: Container(
-                          width: 300,
-                          child: Padding(
-                            padding: EdgeInsets.all(15),
-                            child: ListView(
-                              shrinkWrap: true,
-                              children: [
-                                Center(
-                                  child: Text(
-                                    "Perfil editado com sucesso.",
-                                    style: TextStyle(fontSize: 16),
+                    context: context,
+                    child: Dialog(
+                      child: Container(
+                        width: 300,
+                        child: Padding(
+                          padding: EdgeInsets.all(15),
+                          child: ListView(
+                            shrinkWrap: true,
+                            children: [
+                              Center(
+                                child: Text(
+                                  "Perfil editado com sucesso.",
+                                  style: TextStyle(fontSize: 16),
+                                ),
+                              ),
+                              SizedBox(height: 5),
+                              Padding(
+                                padding: EdgeInsets.symmetric(horizontal: 70),
+                                child: CustomCursor(
+                                  cursorStyle: CustomCursor.pointer,
+                                  child: RaisedButton(
+                                    child: Text(
+                                      "OK",
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    color: Colors.blue,
+                                    onPressed: () =>
+                                        Navigator.of(context).pop(),
                                   ),
                                 ),
-                                SizedBox(height: 5),
-                                Padding(
-                                  padding: EdgeInsets.symmetric(horizontal: 70),
-                                  child: CustomCursor(
-                                    cursorStyle: CustomCursor.pointer,
-                                    child: RaisedButton(
-                                      child: Text(
-                                        "OK",
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                      color: Colors.blue,
-                                      onPressed: () =>
-                                          Navigator.of(context).pop(),
-                                    ),
-                                  ),
-                                )
-                              ],
-                            ),
+                              )
+                            ],
                           ),
                         ),
-                      ));
+                      ),
+                    ),
+                  );
                 },
               ),
             ),

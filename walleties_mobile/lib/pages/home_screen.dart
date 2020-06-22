@@ -5,6 +5,7 @@ import 'package:walleties_mobile/pages/HS_widgets/card_aba.dart';
 import 'package:walleties_mobile/pages/HS_widgets/drawer.dart';
 import 'package:walleties_mobile/pages/HS_widgets/geral_aba.dart';
 import 'package:walleties_mobile/pages/HS_widgets/manage_cards.dart';
+import 'package:walleties_mobile/pages/HS_widgets/operacoes.dart';
 
 class HomeScreen extends StatelessWidget {
   @override
@@ -54,7 +55,16 @@ class HomeScreen extends StatelessWidget {
                   children: List.generate(
                     4,
                     (index) => FlatButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) {
+                              return Operacoes(index);
+                            },
+                          ),
+                        );
+                      },
                       child: Text(
                         model.currentOption[3][index],
                         style: TextStyle(

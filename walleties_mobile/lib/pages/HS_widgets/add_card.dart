@@ -119,30 +119,50 @@ class _AddCardState extends State<AddCard> {
                     ),
                     color: lighterGreen,
                     onPressed: () async {
-                      var res = await model.addCard(
-                        _nomeController.text,
-                        _numeroCartaoController.text,
-                        _validadeController.text,
-                        _cvvController.text,
-                        model.chosenBank,
-                        _agenciaController.text,
-                        _contaController.text,
-                      );
-                      if (res) {
-                        model.updateIsAddCardFormOpen(false);
+                      bool aux = true;
+                      for (var card in model.userCards) {
+                        if (model.chosenBank == card[4]) {
+                          aux = false;
+                        }
                       }
-                      showDialog(
-                          context: context,
-                          builder: (context) {
-                            Future.delayed(Duration(seconds: 1), () {
-                              Navigator.of(context).pop(true);
+
+                      if (_formKey.currentState.validate() && aux) {
+                        var res = await model.addCard(
+                          _nomeController.text,
+                          _numeroCartaoController.text,
+                          _validadeController.text,
+                          _cvvController.text,
+                          model.chosenBank,
+                          _agenciaController.text,
+                          _contaController.text,
+                        );
+                        if (res) {
+                          model.updateIsAddCardFormOpen(false);
+                        }
+                        showDialog(
+                            context: context,
+                            builder: (context) {
+                              Future.delayed(Duration(seconds: 1), () {
+                                Navigator.of(context).pop(true);
+                              });
+                              return ResultAddDialog(
+                                res
+                                    ? "Conta adicionada com sucesso!"
+                                    : "Não foi possível completar a operação!",
+                              );
                             });
-                            return ResultAddDialog(
-                              res
-                                  ? "Conta adicionada com sucesso!"
-                                  : "Não foi possível completar a operação!",
-                            );
-                          });
+                      } else {
+                        showDialog(
+                            context: context,
+                            builder: (context) {
+                              Future.delayed(Duration(seconds: 1), () {
+                                Navigator.of(context).pop(true);
+                              });
+                              return ResultAddDialog(
+                                "Máximo de uma conta por banco!",
+                              );
+                            });
+                      }
                     },
                   ),
                 ),
@@ -196,8 +216,8 @@ class AddCardField extends StatelessWidget {
           ),
           contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: 10),
         ),
-        onChanged: (String value) {
-          // cvmodel.updateItem(value, _index);
+        validator: (value) {
+          return value.isEmpty ? '*Campo obrigatório' : null;
         },
       ),
     );
@@ -254,10 +274,12 @@ class ResultAddDialog extends StatelessWidget {
       child: Container(
         alignment: Alignment.center,
         width: 80,
-        height: 60,
+        height: 80,
         padding: EdgeInsets.symmetric(horizontal: 10, vertical: 20),
         child: Text(
           title,
+          // overflow: TextOverflow.visible,
+          softWrap: true,
           style: TextStyle(
             fontWeight: FontWeight.w600,
           ),

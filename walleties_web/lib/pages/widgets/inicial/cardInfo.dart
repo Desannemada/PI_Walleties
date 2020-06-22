@@ -24,12 +24,13 @@ class CardInfo extends StatelessWidget {
         result = double.parse(
             fmodel.userCards[i][8].replaceAll('.', '').replaceAll(',', '.'));
       } else if (index == 1) {
-        result = double.parse(fmodel.userCards[i][9]
-                .replaceAll('.', '')
-                .replaceAll(',', '.')) -
-            double.parse(fmodel.userCards[i][8]
-                .replaceAll('.', '')
-                .replaceAll(',', '.'));
+        for (var compra in fmodel.faturaCredito) {
+          if (compra['name_bank'] == fmodel.userCards[i][4]) {
+            result = result +
+                double.parse(
+                    compra['valor'].replaceAll('.', '').replaceAll(',', '.'));
+          }
+        }
       } else if (index == 2) {
         result = double.parse(fmodel.userCards[i][9]
                 .replaceAll('.', '')
@@ -53,38 +54,7 @@ class CardInfo extends StatelessWidget {
       ),
     ];
 
-    return /*!checkCard()
-        ? Container(
-            padding: EdgeInsets.all(30),
-            color: Colors.white.withOpacity(0.3),
-            alignment: Alignment.topLeft,
-            child: Container(
-              color: Colors.white,
-              height: 300,
-              width: 200,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "Info de Cartão e Conta",
-                    style: TextStyle(
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  SizedBox(height: 20),
-                  ListView.builder(
-                    shrinkWrap: true,
-                    itemCount:
-                        fmodel.userCards[fmodel.currentOption[0] - 1].length,
-                    itemBuilder: (context, index) => Text(
-                        fmodel.userCards[fmodel.currentOption[0] - 1][index]),
-                  ),
-                ],
-              ),
-            ),
-          )
-        : */
-        Container(
+    return Container(
       height: MediaQuery.of(context).size.height - (type != 2 ? 70 : 120),
       color: Colors.white.withOpacity(0.3),
       child: Row(
@@ -219,10 +189,8 @@ class CardInfo extends StatelessWidget {
                                           shadows: false,
                                         ),
                                         InfoTexts(
-                                          text: fmodel.userCards[
-                                                  fmodel.currentOption[0] -
-                                                      1][8] +
-                                              " ",
+                                          text: getPath(
+                                              fmodel.currentOption[0] - 1, 0),
                                           size: 18,
                                           hover: true,
                                           weight: FontWeight.bold,

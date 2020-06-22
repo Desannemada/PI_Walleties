@@ -22,7 +22,8 @@ class AuthProvider {
                   .replaceAll("=s96-c", "")
               : "assets/profileImage.jpg"
         ];
-        MainViewModel().updateUserInfo(aux);
+        print(aux);
+        // MainViewModel().updateUserInfo();
         return "Ok";
       } else {
         return "Error";
@@ -49,7 +50,7 @@ class AuthProvider {
                 .replaceAll("=s96-c", "")
             : "assets/profileImage.jpg"
       ];
-      MainViewModel().updateUserInfo(aux);
+      // MainViewModel().updateUserInfo(aux);
       print("Signing up sucessfull: $email and $password");
       return "Ok";
     } catch (e) {
@@ -83,7 +84,7 @@ class AuthProvider {
                   .replaceAll("=s96-c", "")
               : "assets/profileImage.jpg"
         ];
-        MainViewModel().updateUserInfo(aux);
+        // MainViewModel().updateUserInfo(aux);
         return "Ok";
       }
     } catch (e) {

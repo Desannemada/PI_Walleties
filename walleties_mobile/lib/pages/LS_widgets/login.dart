@@ -129,7 +129,7 @@ class _LoginState extends State<Login> {
                             });
                           } else if (res == "Ok") {
                             print("Login ok!");
-                            model.getUserInfo();
+                            model.updateUserInfo();
                             model.updateIsAddCardFormOpen(false);
                             setState(() {
                               error = "";
@@ -184,7 +184,7 @@ class _LoginState extends State<Login> {
                           });
                         } else if (res == "Ok") {
                           print("Google Login OK!");
-                          model.getUserInfo();
+                          model.updateUserInfo();
                           model.updateIsAddCardFormOpen(false);
                           setState(() {
                             error = "";

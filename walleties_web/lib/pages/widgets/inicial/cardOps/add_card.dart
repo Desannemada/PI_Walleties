@@ -135,9 +135,16 @@ class _AddCardState extends State<AddCard> {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    onPressed: () {
-                      if (cvmodel.isValid) {
-                        fmodel.addCard(
+                    onPressed: () async {
+                      bool aux = true;
+                      for (var card in fmodel.userCards) {
+                        if (model.chosenBank == card[4]) {
+                          aux = false;
+                        }
+                      }
+
+                      if (cvmodel.isValid && aux) {
+                        var res = await fmodel.addCard(
                             _nomeController.text,
                             _numeroCartaoController.text,
                             _validadeController.text,
@@ -145,14 +152,25 @@ class _AddCardState extends State<AddCard> {
                             model.chosenBank,
                             _agenciaController.text,
                             _contaController.text);
-                        Navigator.of(context).pop();
+                        if (res) {
+                          Navigator.of(context).pop();
+                        }
                         showDialog(
                             context: context,
                             builder: (context) {
                               Future.delayed(Duration(seconds: 1), () {
                                 Navigator.of(context).pop(true);
                               });
-                              return ResultAddDialog();
+                              return ResultAddDialog(res ? 0 : 1);
+                            });
+                      } else {
+                        showDialog(
+                            context: context,
+                            builder: (context) {
+                              Future.delayed(Duration(seconds: 1), () {
+                                Navigator.of(context).pop(true);
+                              });
+                              return ResultAddDialog(2);
                             });
                       }
                     },
@@ -180,6 +198,9 @@ class _AddCardState extends State<AddCard> {
 }
 
 class ResultAddDialog extends StatelessWidget {
+  final index;
+  ResultAddDialog(this.index);
+
   @override
   Widget build(BuildContext context) {
     return Dialog(
@@ -189,7 +210,11 @@ class ResultAddDialog extends StatelessWidget {
         height: 60,
         padding: EdgeInsets.symmetric(horizontal: 10, vertical: 20),
         child: Text(
-          "Conta adicionada com sucesso!",
+          index == 0
+              ? "Conta adicionada com sucesso!"
+              : index == 1
+                  ? "Erro ao adicionar cartão."
+                  : "Máximo de uma conta por banco!",
           style: TextStyle(
             fontWeight: FontWeight.w600,
           ),

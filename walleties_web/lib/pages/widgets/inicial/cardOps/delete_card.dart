@@ -125,9 +125,25 @@ class DeleteCard extends StatelessWidget {
                                   ),
                                   actions: [
                                     FlatButton(
-                                      onPressed: () {
-                                        fmodel.deleteCard(index);
-                                        Navigator.of(context).pop();
+                                      onPressed: () async {
+                                        var res =
+                                            await fmodel.deleteCard(index);
+                                        if (res) {
+                                          Navigator.of(context).pop();
+                                        }
+                                        showDialog(
+                                            context: context,
+                                            builder: (context) {
+                                              Future.delayed(
+                                                  Duration(seconds: 1), () {
+                                                Navigator.of(context).pop(true);
+                                              });
+                                              return ResultDeleteDialog(
+                                                res
+                                                    ? "Conta removida com sucesso!"
+                                                    : "Não foi possível completar a operação!",
+                                              );
+                                            });
                                       },
                                       child: Text(
                                         "SIM",
@@ -169,6 +185,29 @@ class DeleteCard extends StatelessWidget {
                   )
                 : Container(),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class ResultDeleteDialog extends StatelessWidget {
+  final String title;
+  ResultDeleteDialog(this.title);
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      child: Container(
+        alignment: Alignment.center,
+        width: 80,
+        height: 60,
+        padding: EdgeInsets.symmetric(horizontal: 10, vertical: 20),
+        child: Text(
+          title,
+          style: TextStyle(
+            fontWeight: FontWeight.w600,
+          ),
         ),
       ),
     );

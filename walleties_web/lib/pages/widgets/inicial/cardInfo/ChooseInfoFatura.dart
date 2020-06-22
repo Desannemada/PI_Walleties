@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:walleties/colors/colors.dart';
 import 'package:walleties/model/firestore_model.dart';
@@ -10,17 +11,44 @@ class ChooseInfoFatura extends StatelessWidget {
     final fmodel = Provider.of<FirestoreModel>(context);
 
     double barSize() {
-      double result = (double.parse(fmodel
-                  .userCards[fmodel.currentOption[0] - 1][9]
-                  .replaceAll('.', '')
-                  .replaceAll(',', '.')) -
-              double.parse(fmodel.userCards[fmodel.currentOption[0] - 1][8]
-                  .replaceAll('.', '')
-                  .replaceAll(',', '.'))) /
+      double fatura = 0.0;
+      for (var compra in fmodel.faturaCredito) {
+        if (compra['name_bank'] ==
+            fmodel.userCards[fmodel.currentOption[0] - 1][4]) {
+          fatura = fatura +
+              double.parse(
+                  compra['valor'].replaceAll('.', '').replaceAll(',', '.'));
+        }
+      }
+      double result = (fatura /
           double.parse(fmodel.userCards[fmodel.currentOption[0] - 1][9]
               .replaceAll('.', '')
-              .replaceAll(',', '.'));
+              .replaceAll(',', '.')));
       return result;
+    }
+
+    String getInfo(int index) {
+      double result = 0.0;
+      for (var compra in fmodel.faturaCredito) {
+        if (compra['name_bank'] ==
+            fmodel.userCards[fmodel.currentOption[0] - 1][4]) {
+          result = result +
+              double.parse(
+                  compra['valor'].replaceAll('.', '').replaceAll(',', '.'));
+        }
+      }
+
+      if (index == 0) {
+        return NumberFormat.currency(locale: "pt_br", symbol: 'R\$ ')
+            .format(result);
+      } else if (index == 1) {
+        double limite = double.parse(fmodel
+            .userCards[fmodel.currentOption[0] - 1][9]
+            .replaceAll('.', '')
+            .replaceAll(',', '.'));
+        return NumberFormat.currency(locale: "pt_br", symbol: 'R\$ ')
+            .format(limite - result);
+      }
     }
 
     return Container(
@@ -96,27 +124,15 @@ class ChooseInfoFatura extends StatelessWidget {
                             ),
                             SizedBox(width: 10),
                             Text(
-                              (double.parse(fmodel.userCards[
-                                              fmodel.currentOption[0] - 1][9]
-                                          .replaceAll('.', '')
-                                          .replaceAll(',', '.')) -
-                                      double.parse(fmodel.userCards[
-                                              fmodel.currentOption[0] - 1][8]
-                                          .replaceAll('.', '')
-                                          .replaceAll(',', '.')))
-                                  .toString(),
+                              getInfo(0),
                               style: TextStyle(
-                                  fontSize: 24,
-                                  color: lightGreen,
-                                  fontWeight: FontWeight.bold),
+                                fontSize: 24,
+                                color: lightGreen,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ],
                         ),
-                        /*amodel.accounts[amodel.currentAccount]['faturas']
-                                        [amodel.faturaAtual]['credito']
-                                    ['disponivel'] !=
-                                ''
-                            ? */
                         Wrap(
                           crossAxisAlignment: WrapCrossAlignment.end,
                           children: <Widget>[
@@ -128,22 +144,7 @@ class ChooseInfoFatura extends StatelessWidget {
                             ),
                             SizedBox(width: 10),
                             Text(
-                              (double.parse(fmodel
-                                          .userCards[fmodel.currentOption[0] - 1]
-                                              [9]
-                                          .replaceAll('.', '')
-                                          .replaceAll(',', '.')) -
-                                      (double.parse(fmodel
-                                              .userCards[fmodel.currentOption[0] - 1]
-                                                  [9]
-                                              .replaceAll('.', '')
-                                              .replaceAll(',', '.')) -
-                                          double.parse(fmodel
-                                              .userCards[fmodel.currentOption[0] - 1]
-                                                  [8]
-                                              .replaceAll('.', '')
-                                              .replaceAll(',', '.'))))
-                                  .toString(),
+                              getInfo(1),
                               style: TextStyle(
                                 fontSize: 24,
                                 color: fmodel.currentOption[2],

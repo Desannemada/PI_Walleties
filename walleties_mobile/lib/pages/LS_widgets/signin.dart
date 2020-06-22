@@ -158,7 +158,7 @@ class _SignInState extends State<SignIn> {
                                 _emailController.text +
                                 " " +
                                 _passwordController.text);
-                            model.getUserInfo();
+                            model.updateUserInfo();
                             showDialog(
                               context: context,
                               child: SignInDialog(),

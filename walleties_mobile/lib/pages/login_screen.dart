@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:walleties_mobile/colors/colors.dart';
-import 'package:walleties_mobile/models/firebase_auth.dart';
 import 'package:walleties_mobile/models/main_view_model.dart';
 import 'package:walleties_mobile/pages/LS_widgets/login.dart';
 import 'package:walleties_mobile/pages/LS_widgets/signin.dart';
