@@ -48,5 +48,5 @@ flutter run
 ## Integrantes
 | <img src="/developers_profile/renato.png" width="150">  | <img src="/developers_profile/bruno.png" width="150">  | <img src="/developers_profile/neto.png" width="150">  | <img src="/developers_profile/anne.png" width="150"> |
 | :--------------------: | :--------------------: | :-----------------: | :-------------------:    |
-| **Renato Aquino**      | **Bruno Meira**        | **Antônio Pantoja** | **Anne Gonçalves**       |
+| **Renato Aquino**      | **Bruno Meira**        | **Antônio Neto**    | **Anne Gonçalves**       |
 | Desenvolvedor Back-End | Cyber Security         | Gerente de Projeto  | Desenvolvedora Front-End |
