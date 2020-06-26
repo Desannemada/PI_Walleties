@@ -85,6 +85,7 @@ class AbaGeral extends StatelessWidget {
                       model.updateInfoQRCode("");
                       model.updateChooseCobCard(0);
                     } else {
+                      model.createSliders();
                       model.updateInfogetQRCode([]);
                     }
                     model.updateChecks();
@@ -138,28 +139,6 @@ class GeralCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final model = Provider.of<MainViewModel>(context);
-
-    String getSingular(int i, int index) {
-      double result = 0;
-      if (index == 2) {
-        result = double.parse(
-            model.userCards[i][8].replaceAll('.', '').replaceAll(',', '.'));
-      } else if (index == 0) {
-        for (var compra in model.faturaCredito) {
-          if (compra['name_bank'] == model.userCards[i][4]) {
-            result = result +
-                double.parse(
-                    compra['valor'].replaceAll('.', '').replaceAll(',', '.'));
-          }
-        }
-      } else if (index == 1) {
-        result = result +
-            double.parse(
-                model.userCards[i][9].replaceAll('.', '').replaceAll(',', '.'));
-      }
-      return NumberFormat.currency(locale: "pt_br", symbol: 'R\$ ')
-          .format(result);
-    }
 
     String getTotal(int index) {
       double result = 0;
@@ -255,7 +234,7 @@ class GeralCard extends StatelessWidget {
                                         ),
                                       ),
                                       Text(
-                                        getSingular(i, index),
+                                        model.getSingular(i, index),
                                         style: TextStyle(
                                           color: model.getOptions(i + 1)[2],
                                           fontSize: 16,

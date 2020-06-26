@@ -4,10 +4,10 @@ import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
+import 'package:walleties_mobile/colors/colors.dart';
 import 'package:walleties_mobile/extra/my_flutter_app_icons.dart';
 import 'package:walleties_mobile/models/main_view_model.dart';
 import 'package:walleties_mobile/pages/HS_widgets/operacoes.dart';
-import 'dart:convert';
 
 class DigiOps extends StatelessWidget {
   final int index;
@@ -24,6 +24,24 @@ class DigiOps extends StatelessWidget {
           color: model.currentOption[2],
           onPressed: () => Navigator.of(context).pop(),
         ),
+        actions: [
+          index == 1 && model.infogetQRCode.length > 2
+              ? FlatButton(
+                  onPressed: () {
+                    model.createSliders();
+                    model.updateInfogetQRCode([]);
+                  },
+                  child: Text(
+                    "Repetir",
+                    style: TextStyle(
+                      color: Colors.blue,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                )
+              : Container()
+        ],
         title: Text(
           index == 0 ? "Cobrar" : "Pagar",
           style: TextStyle(
@@ -54,6 +72,7 @@ class DigiOpPagar extends StatelessWidget {
   Widget build(BuildContext context) {
     final model = Provider.of<MainViewModel>(context);
     List ops = ["NOME: ", "AGÊNCIA: ", "CONTA: ", "VALOR: "];
+    List ops2 = ["Fatura", "Disponível", "Saldo"];
 
     return model.infogetQRCode.length == 5
         ? Padding(
@@ -85,6 +104,7 @@ class DigiOpPagar extends StatelessWidget {
                             ops[index],
                             style: TextStyle(
                               fontSize: 18,
+                              color: yellow,
                             ),
                           ),
                           Text(
@@ -108,6 +128,151 @@ class DigiOpPagar extends StatelessWidget {
                     ),
                   ),
                 ),
+                SizedBox(height: 20),
+                Text(
+                  "Escolha sua forma de pagamento: ",
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                SizedBox(height: 15),
+                ListView.separated(
+                  shrinkWrap: true,
+                  physics: NeverScrollableScrollPhysics(),
+                  itemCount: model.userCards.length,
+                  separatorBuilder: (context, index) => Divider(),
+                  itemBuilder: (context, index) => Container(
+                    width: double.infinity,
+                    child: Column(
+                      children: [
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Row(
+                              children: [
+                                Container(
+                                  width: 50,
+                                  height: 50,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: model.getOptions(index + 1)[2],
+                                  ),
+                                  child: Center(
+                                    child: Text(
+                                      model.getOptions(index + 1)[1][0],
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 22,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                SizedBox(width: 15),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      model.userCards[index][0],
+                                      style: TextStyle(
+                                        fontSize: 15,
+                                      ),
+                                    ),
+                                    SizedBox(height: 3),
+                                    Text(
+                                      "****-****-****-" +
+                                          model.userCards[index][1]
+                                              .substring(15),
+                                      style: TextStyle(
+                                        color: model.getOptions(index + 1)[2],
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 15,
+                                      ),
+                                    ),
+                                    Container(
+                                      decoration: BoxDecoration(
+                                        border: Border.all(
+                                          color: model.getOptions(index + 1)[2],
+                                        ),
+                                      ),
+                                      child: Slider(
+                                        value: model.sliders[index],
+                                        divisions: 10,
+                                        label: model.getMoney(model
+                                            .sliders[index]
+                                            .toStringAsFixed(2)
+                                            .toString()
+                                            .replaceAll(".", ",")),
+                                        onChanged: (value) {
+                                          model.updateSliders(value, index);
+                                          print(value);
+                                        },
+                                        min: 0.0,
+                                        max: double.parse(model.infogetQRCode[3]
+                                                .replaceAll('.', '')
+                                                .replaceAll(',', '.')) -
+                                            model.getMaxSliders(index),
+                                      ),
+                                    )
+                                  ],
+                                ),
+                              ],
+                            ),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: List.generate(
+                                  3,
+                                  (i) => Column(
+                                    crossAxisAlignment: CrossAxisAlignment.end,
+                                    children: [
+                                      Text(ops2[i]),
+                                      Text(
+                                        model.getSingular(index, i),
+                                        style: TextStyle(
+                                          color: model.getOptions(index + 1)[2],
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                      SizedBox(height: 5)
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        Text(
+                          "Total: " +
+                              model.getMoney(model.sliders[index]
+                                  .toStringAsFixed(2)
+                                  .toString()
+                                  .replaceAll(".", ",")),
+                          style: TextStyle(
+                            color: Colors.blue,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 15,
+                          ),
+                        ),
+                        Text(
+                          "%: " +
+                              ((model.sliders[index] * 100) /
+                                      double.parse(model.infogetQRCode[3]
+                                          .replaceAll('.', '')
+                                          .replaceAll(',', '.')))
+                                  .round()
+                                  .toString(),
+                          style: TextStyle(
+                            color: Colors.blue,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 15,
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
+                )
               ],
             ),
           )

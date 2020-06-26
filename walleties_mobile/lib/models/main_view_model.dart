@@ -78,6 +78,31 @@ class MainViewModel with ChangeNotifier {
     notifyListeners();
   }
 
+  List _sliders = [];
+  List get sliders => _sliders;
+  void createSliders() {
+    _sliders = [];
+    for (var i = 0; i < userCards.length; i++) {
+      _sliders.add(0.0);
+    }
+    notifyListeners();
+  }
+
+  void updateSliders(double value, int i) {
+    _sliders[i] = value;
+    notifyListeners();
+  }
+
+  double getMaxSliders(int index) {
+    double value = 0.0;
+    for (var i = 0; i < sliders.length; i++) {
+      if (i != index) {
+        value = value + sliders[i];
+      }
+    }
+    return value;
+  }
+
   MainViewModel() {
     _atualLoginWidget = LoginScreenMenu();
     updateUserInfo();
@@ -300,6 +325,7 @@ class MainViewModel with ChangeNotifier {
       }
       getCredito();
       getDebito();
+      createSliders();
     }
   }
 
@@ -418,5 +444,36 @@ class MainViewModel with ChangeNotifier {
     } else {
       return false;
     }
+  }
+
+  String getMoney(String valor) {
+    return NumberFormat.currency(
+      locale: "pt_br",
+      symbol: 'R\$',
+    )
+        .format(double.parse(valor.replaceAll('.', '').replaceAll(',', '.')))
+        .toString();
+  }
+
+  String getSingular(int i, int index) {
+    double result = 0;
+    if (index == 2) {
+      result = double.parse(
+          userCards[i][8].replaceAll('.', '').replaceAll(',', '.'));
+    } else if (index == 0) {
+      for (var compra in faturaCredito) {
+        if (compra['name_bank'] == userCards[i][4]) {
+          result = result +
+              double.parse(
+                  compra['valor'].replaceAll('.', '').replaceAll(',', '.'));
+        }
+      }
+    } else if (index == 1) {
+      result = result +
+          double.parse(
+              userCards[i][9].replaceAll('.', '').replaceAll(',', '.'));
+    }
+    return NumberFormat.currency(locale: "pt_br", symbol: 'R\$ ')
+        .format(result);
   }
 }
