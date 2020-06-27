@@ -50,3 +50,9 @@ flutter run
 | :--------------------: | :--------------------: | :-----------------: | :-------------------:    |
 | **Renato Aquino**      | **Bruno Meira**        | **Antônio Neto**    | **Anne Gonçalves**       |
 | Desenvolvedor Back-End | Cyber Security         | Gerente de Projeto  | Desenvolvedora Front-End |
+
+## Tecnologias Utilizadas
+| <img src="/developers_profile/renato.png" width="150">  | <img src="/developers_profile/bruno.png" width="150">  | <img src="/developers_profile/neto.png" width="150">  | <img src="/developers_profile/anne.png" width="150"> |
+| :----------------------: | :----------------------: | :----------------------: | :----------------------: |
+| **Dart**                 | **Flutter**              | **Firebase**             | **MongoDB**              |
+| Linguagem de Programação | Framework                | Autentincação            | Banco de Dados da API    |
