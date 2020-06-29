@@ -15,6 +15,7 @@ class AbaGeral extends StatelessWidget {
     return Container(
       padding: EdgeInsets.all(15),
       child: ListView(
+        shrinkWrap: true,
         children: [
           model.userCards.isNotEmpty
               ? Center(
@@ -37,7 +38,14 @@ class AbaGeral extends StatelessWidget {
                             fontSize: 22,
                           ),
                         ),
-                        onPressed: () => model.updateCurrentOption(index + 1),
+                        onPressed: () {
+                          model.updateCurrentOption(index + 1);
+                          model.updateCardMonths(model.fMonths);
+                          model.updateCurrentMonth(
+                              model.getMonth(DateTime.now().month) +
+                                  " " +
+                                  DateTime.now().year.toString());
+                        },
                       ),
                     ),
                   ),
@@ -80,23 +88,51 @@ class AbaGeral extends StatelessWidget {
                     ),
                   ),
                   onPressed: () {
-                    if (index == 0) {
-                      model.updateShowQRCode(false);
-                      model.updateInfoQRCode("");
-                      model.updateChooseCobCard(0);
+                    if (model.userCards.isNotEmpty) {
+                      if (index == 0) {
+                        model.updateShowQRCode(false);
+                        model.updateInfoQRCode("");
+                        model.updateChooseCobCard(0);
+                        model.updateCobMoney("0,00");
+                      } else {
+                        model.createSliders();
+                        model.updateInfogetQRCode([]);
+                      }
+                      model.updateChecks();
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) {
+                            return DigiOps(index);
+                          },
+                        ),
+                      );
                     } else {
-                      model.createSliders();
-                      model.updateInfogetQRCode([]);
+                      showDialog(
+                        context: context,
+                        child: AlertDialog(
+                          title: Text("Aviso"),
+                          content: Text(
+                              "Cadastre um cartão antes de realizar operações."),
+                          actions: [
+                            FlatButton(
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                              child: Center(
+                                child: Text(
+                                  "OK",
+                                  style: TextStyle(
+                                    color: darkGreen,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            )
+                          ],
+                        ),
+                      );
                     }
-                    model.updateChecks();
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) {
-                          return DigiOps(index);
-                        },
-                      ),
-                    );
                   },
                 ),
               ),
@@ -104,7 +140,10 @@ class AbaGeral extends StatelessWidget {
           ),
           SizedBox(height: 30),
           Container(
-            height: MediaQuery.of(context).size.height * 0.35,
+            height: 123.0 +
+                (model.userCards.isNotEmpty
+                    ? (55.0 * (model.userCards.length))
+                    : 100),
             child: ListView(
               shrinkWrap: true,
               scrollDirection: Axis.horizontal,
@@ -120,7 +159,10 @@ class AbaGeral extends StatelessWidget {
           SizedBox(height: 30),
           Align(
             child: Container(
-              height: MediaQuery.of(context).size.height * 0.35,
+              height: 123.0 +
+                  (model.userCards.isNotEmpty
+                      ? (55.0 * (model.userCards.length))
+                      : 100),
               child: GeralCard("Saldo Atual", 2),
             ),
           ),
@@ -158,14 +200,46 @@ class GeralCard extends StatelessWidget {
                   compra['valor'].replaceAll('.', '').replaceAll(',', '.'));
         }
       } else if (index == 1) {
-        for (var card in model.userCards) {
+        for (var i = 0; i < model.userCards.length; i++) {
           result = result +
-              double.parse(card[9].replaceAll('.', '').replaceAll(',', '.'));
+              (double.parse(model.userCards[i][9]
+                      .replaceAll('.', '')
+                      .replaceAll(',', '.')) -
+                  double.parse(model
+                      .getSingular(i, 0)
+                      .substring(3)
+                      .replaceAll('.', '')
+                      .replaceAll(',', '.')));
         }
       }
       return NumberFormat.currency(locale: "pt_br", symbol: 'R\$ ')
           .format(result);
     }
+
+    double barSize(int index, int i) {
+      double result;
+      result = double.parse(model
+              .getSingular(i, index)
+              .substring(3)
+              .replaceAll('.', '')
+              .replaceAll(',', '.')) /
+          double.parse(getTotal(index)
+              .substring(3)
+              .replaceAll('.', '')
+              .replaceAll(',', '.'));
+
+      if (result.isNaN) {
+        return 0;
+      }
+      return result;
+    }
+
+    // GlobalKey _keyRed = GlobalKey();
+    // _getSizes() {
+    //   final RenderBox renderBoxRed = _keyRed.currentContext.findRenderObject();
+    //   final sizeRed = renderBoxRed.size;
+    //   print("SIZE of Red: $sizeRed");
+    // }
 
     return Container(
       height: double.infinity,
@@ -178,7 +252,9 @@ class GeralCard extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.all(12),
           child: ListView(
+            physics: NeverScrollableScrollPhysics(),
             children: [
+              // FlatButton(onPressed: () => _getSizes(), child: Text("ah")),
               Center(
                 child: Text(
                   title,
@@ -192,6 +268,16 @@ class GeralCard extends StatelessWidget {
                 color: Colors.black.withOpacity(0.4),
                 height: 20,
               ),
+              Center(
+                child: Text(
+                  getTotal(index),
+                  style: TextStyle(
+                    fontSize: 25,
+                    color: lightGreen,
+                  ),
+                ),
+              ),
+              SizedBox(height: 15),
               model.userCards.isNotEmpty
                   ? Column(
                       children: List.generate(
@@ -245,7 +331,20 @@ class GeralCard extends StatelessWidget {
                                   SizedBox(height: 3),
                                   Container(
                                     height: 10,
-                                    color: model.getOptions(i + 1)[2],
+                                    width: double.infinity,
+                                    alignment: Alignment.centerLeft,
+                                    decoration: BoxDecoration(
+                                      border: Border.all(
+                                        color: model.getOptions(i + 1)[2],
+                                      ),
+                                    ),
+                                    // color: model.getOptions(i + 1)[2],
+                                    child: FractionallySizedBox(
+                                      widthFactor: barSize(index, i),
+                                      child: Container(
+                                        color: model.getOptions(i + 1)[2],
+                                      ),
+                                    ),
                                   ),
                                 ],
                               ),

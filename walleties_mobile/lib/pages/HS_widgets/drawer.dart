@@ -144,11 +144,14 @@ class UserDrawer extends StatelessWidget {
                                     }
                                   } else {
                                     model.updateCurrentOption(index);
+                                    model.updateWhichAbaFatura(false);
+                                    model.updateCardMonths(model.fMonths);
+                                    model.updateCurrentMonth(
+                                        model.getMonth(DateTime.now().month) +
+                                            " " +
+                                            DateTime.now().year.toString());
                                     if (index != 0) {
                                       model.updateIsTapped(false);
-                                      // amodel.updateCurrentAccount(
-                                      //     model.userCards[
-                                      //         model.currentOption[0] - 1][1]);
                                     }
                                     Navigator.pop(context);
                                   }
@@ -183,34 +186,70 @@ class ConfigMenu extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final model = Provider.of<MainViewModel>(context);
-    return ListView.builder(
-        shrinkWrap: true,
-        itemCount: menu.length,
-        itemBuilder: (context, index) {
-          return Container(
-            margin: EdgeInsets.only(left: 35, right: 35, top: 10),
-            height: 35,
-            child: RaisedButton(
-              padding: EdgeInsets.zero,
-              color: Colors.white,
-              child: Text(
-                menu[index],
-                style: TextStyle(fontSize: 15),
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: ListView.builder(
+          shrinkWrap: true,
+          itemCount: menu.length,
+          itemBuilder: (context, index) {
+            return Container(
+              margin: EdgeInsets.only(left: 35, right: 35, top: 10),
+              height: 35,
+              child: RaisedButton(
+                padding: EdgeInsets.zero,
+                color: Colors.white,
+                child: Text(
+                  menu[index],
+                  style: TextStyle(fontSize: 15),
+                ),
+                onPressed: () async {
+                  if (index == 1) {
+                    showDialog(
+                      context: context,
+                      child: AlertDialog(
+                        title: Text("Sair"),
+                        content: Text("Têm certeza que deseja sair?"),
+                        actions: [
+                          FlatButton(
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                              AuthProvider().signOut();
+                              model.resetCards();
+                              model.changeAtualLoginWidget(LoginScreenMenu());
+                            },
+                            child: Text(
+                              "Sim",
+                              style: TextStyle(
+                                fontWeight: FontWeight.w600,
+                                color: darkGreen,
+                              ),
+                            ),
+                          ),
+                          FlatButton(
+                            onPressed: () => Navigator.of(context).pop(),
+                            child: Text(
+                              "Não",
+                              style: TextStyle(
+                                fontWeight: FontWeight.w600,
+                                color: darkGreen,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  }
+                  if (index == 0) {
+                    model.updateisConfigDown(false);
+                    // showDialog(
+                    //   context: context,
+                    //   child: EditProfile(initialValue: fmodel.userInfo[0]),
+                    // );
+                  }
+                },
               ),
-              onPressed: () {
-                if (index == 1) {
-                  model.changeAtualLoginWidget(LoginScreenMenu());
-                  AuthProvider().signOut();
-                }
-                if (index == 0) {
-                  // showDialog(
-                  //   context: context,
-                  //   child: EditProfile(initialValue: fmodel.userInfo[0]),
-                  // );
-                }
-              },
-            ),
-          );
-        });
+            );
+          }),
+    );
   }
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:walleties_mobile/colors/colors.dart';
 import 'package:walleties_mobile/models/main_view_model.dart';
@@ -17,6 +18,13 @@ class _AddCardState extends State<AddCard> {
   TextEditingController _cvvController;
   TextEditingController _agenciaController;
   TextEditingController _contaController;
+
+  final FocusNode _nomeFocus = new FocusNode();
+  final FocusNode _numeroFocus = new FocusNode();
+  final FocusNode _validadeFocus = new FocusNode();
+  final FocusNode _cvvFocus = new FocusNode();
+  final FocusNode _agenciaFocus = new FocusNode();
+  final FocusNode _contaFocus = new FocusNode();
 
   @override
   void initState() {
@@ -43,6 +51,7 @@ class _AddCardState extends State<AddCard> {
   @override
   Widget build(BuildContext context) {
     final model = Provider.of<MainViewModel>(context);
+
     return Padding(
       padding: const EdgeInsets.only(bottom: 15),
       child: Form(
@@ -54,11 +63,19 @@ class _AddCardState extends State<AddCard> {
               controller: _nomeController,
               hint: "MARY A MARTINS",
               label: "Nome do Titular",
+              mask: ["", ""],
+              index: 0,
+              focus: [_nomeFocus, _numeroFocus],
+              context: context,
             ),
             AddCardField(
               controller: _numeroCartaoController,
               hint: "0000-0000-0000-0000",
               label: "Número do Cartão",
+              mask: ["xxxx-xxxx-xxxx-xxxx", "-"],
+              index: 1,
+              focus: [_numeroFocus, _validadeFocus],
+              context: context,
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -67,11 +84,19 @@ class _AddCardState extends State<AddCard> {
                   controller: _validadeController,
                   label: "Validade",
                   hint: "mm/yy",
+                  mask: ["xx/xx", "/"],
+                  index: 2,
+                  focus: [_validadeFocus, _cvvFocus],
+                  context: context,
                 ),
                 AddCardField(
                   controller: _cvvController,
                   label: "CVV",
                   hint: "000 / 0000",
+                  mask: ["xxxx", ""],
+                  index: 3,
+                  focus: [_cvvFocus, _agenciaFocus],
+                  context: context,
                 ),
               ],
             ),
@@ -82,12 +107,20 @@ class _AddCardState extends State<AddCard> {
                 AddCardField(
                   controller: _agenciaController,
                   label: "Agência",
-                  hint: "a",
+                  hint: "1234",
+                  mask: ["xxxxxxxxxx", ""],
+                  index: 4,
+                  focus: [_agenciaFocus, _contaFocus],
+                  context: context,
                 ),
                 AddCardField(
                   controller: _contaController,
                   label: "Conta",
-                  hint: "a",
+                  hint: "12345-6",
+                  mask: ["xxxxxxxxxx", ""],
+                  index: 5,
+                  context: context,
+                  focus: [_contaFocus],
                 ),
               ],
             ),
@@ -151,7 +184,7 @@ class _AddCardState extends State<AddCard> {
                                     : "Não foi possível completar a operação!",
                               );
                             });
-                      } else {
+                      } else if (!aux) {
                         showDialog(
                             context: context,
                             builder: (context) {
@@ -176,25 +209,38 @@ class _AddCardState extends State<AddCard> {
 }
 
 class AddCardField extends StatelessWidget {
-  const AddCardField({
-    @required TextEditingController controller,
-    @required String hint,
-    @required String label,
-    // @required int index,
-  })  : _controller = controller,
+  const AddCardField(
+      {@required TextEditingController controller,
+      @required String hint,
+      @required String label,
+      @required List<String> mask,
+      @required int index,
+      @required context,
+      List<FocusNode> focus})
+      : _controller = controller,
         _hint = hint,
-        _label = label;
-  // _index = index;
+        _label = label,
+        _mask = mask,
+        _index = index,
+        _focus = focus,
+        _context = context;
 
   final TextEditingController _controller;
   final String _hint;
   final String _label;
-  // final int _index;
+  final List<String> _mask;
+  final int _index;
+  final List<FocusNode> _focus;
+  final BuildContext _context;
+
+  _fieldFocusChange(
+      BuildContext context, FocusNode currentFocus, FocusNode nextFocus) {
+    currentFocus.unfocus();
+    FocusScope.of(context).requestFocus(nextFocus);
+  }
 
   @override
   Widget build(BuildContext context) {
-    // final cvmodel = Provider.of<CardValidationModel>(context);
-
     double pad;
     if (["CVV", "Validade", "Conta", "Agência"].contains(_label)) {
       pad = 180;
@@ -207,17 +253,59 @@ class AddCardField extends StatelessWidget {
       padding: EdgeInsets.only(top: 15),
       child: TextFormField(
         controller: _controller,
+        focusNode: _focus[0],
         decoration: InputDecoration(
           hintText: _hint,
           labelText: _label,
-          // errorText: cvmodel.cvi[_index].error,
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(5),
           ),
           contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: 10),
         ),
+        inputFormatters: _index != 0
+            ? [MaskedTextInputFormatter(mask: _mask[0], separator: _mask[1])]
+            : [],
+        textInputAction:
+            _index != 5 ? TextInputAction.next : TextInputAction.done,
+        onFieldSubmitted: (value) {
+          if (_index != 5) {
+            _fieldFocusChange(_context, _focus[0], _focus[1]);
+          }
+        },
         validator: (value) {
-          return value.isEmpty ? '*Campo obrigatório' : null;
+          if (value.isEmpty) {
+            return '*Campo obrigatório';
+          }
+          switch (_index) {
+            case 0:
+              {
+                if (!(RegExp(r"(^[a-zA-Z ]+$)").hasMatch(value))) {
+                  return '*Formato Inválido';
+                }
+              }
+              break;
+            case 1:
+              {
+                if (!RegExp(r"([0-9]{4}[-][0-9]{4}[-][0-9]{4}[-][0-9]{4})")
+                    .hasMatch(value)) {
+                  return '*Formato Inválido';
+                }
+              }
+              break;
+            case 2:
+              {
+                if (!RegExp(r"([0-9]{2}/[0-9]{2})").hasMatch(value)) {
+                  return '*Formato Inválido';
+                }
+              }
+              break;
+            default:
+              {
+                if (!RegExp(r"([0-9])").hasMatch(value)) {
+                  return '*Formato Inválido';
+                }
+              }
+          }
         },
       ),
     );
@@ -286,5 +374,39 @@ class ResultAddDialog extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+class MaskedTextInputFormatter extends TextInputFormatter {
+  final String mask;
+  final String separator;
+
+  MaskedTextInputFormatter({
+    @required this.mask,
+    @required this.separator,
+  }) {
+    assert(mask != null);
+    assert(separator != null);
+  }
+
+  @override
+  TextEditingValue formatEditUpdate(
+      TextEditingValue oldValue, TextEditingValue newValue) {
+    if (newValue.text.length > 0) {
+      if (newValue.text.length > oldValue.text.length) {
+        if (newValue.text.length > mask.length) return oldValue;
+        if (newValue.text.length < mask.length &&
+            mask[newValue.text.length - 1] == separator) {
+          return TextEditingValue(
+            text:
+                '${oldValue.text}$separator${newValue.text.substring(newValue.text.length - 1)}',
+            selection: TextSelection.collapsed(
+              offset: newValue.selection.end + 1,
+            ),
+          );
+        }
+      }
+    }
+    return newValue;
   }
 }

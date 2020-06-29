@@ -13,7 +13,7 @@ class FaturaInfo extends StatelessWidget {
       child: Column(
         children: [
           Text(
-            "Recentes",
+            model.whichAbaFatura ? "Crédito" : "Débito",
             style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
           ),
           SizedBox(height: 20),
@@ -23,13 +23,15 @@ class FaturaInfo extends StatelessWidget {
             itemCount: model.whichAbaFatura
                 ? model.faturaCredito.length
                 : model.faturaDebito.length,
-            // separatorBuilder: (context, i) => Divider(height: 30),
             itemBuilder: (context, i) {
               bool aux = false;
               List aux2 = [];
               if (model.whichAbaFatura) {
                 if (model.faturaCredito[i]['name_bank'] ==
-                    model.userCards[model.currentOption[0] - 1][4]) {
+                        model.userCards[model.currentOption[0] - 1][4] &&
+                    model.getMonthYear(
+                            model.faturaCredito[i]['data'].substring(0, 7)) ==
+                        model.currentMonth) {
                   aux = true;
                   aux2 = [
                     (model.faturaCredito[i]['data']).substring(0, 10),
@@ -43,7 +45,10 @@ class FaturaInfo extends StatelessWidget {
               }
               if (!model.whichAbaFatura) {
                 if (model.faturaDebito[i]['name_bank'] ==
-                    model.userCards[model.currentOption[0] - 1][4]) {
+                        model.userCards[model.currentOption[0] - 1][4] &&
+                    model.getMonthYear(
+                            model.faturaDebito[i]['data'].substring(0, 7)) ==
+                        model.currentMonth) {
                   aux = true;
                   aux2 = [
                     (model.faturaDebito[i]['data']).substring(0, 10),
@@ -70,15 +75,16 @@ class FaturaInfo extends StatelessWidget {
                               ),
                             ),
                             Expanded(
-                                child: Container(
-                              padding: EdgeInsets.symmetric(horizontal: 15),
-                              child: Text(
-                                aux2[1],
-                                style: TextStyle(
-                                  fontSize: 15,
+                              child: Container(
+                                padding: EdgeInsets.symmetric(horizontal: 15),
+                                child: Text(
+                                  aux2[1],
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                  ),
                                 ),
                               ),
-                            )),
+                            ),
                             Text(
                               aux2[2],
                               style: TextStyle(

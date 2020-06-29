@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:responsive_builder/responsive_builder.dart';
 import 'package:walleties/main.dart';
+import 'package:walleties/model/firestore_model.dart';
+import 'package:walleties/model/main_view_model.dart';
+import 'package:walleties/pages/widgets/home/about_info.dart';
 import 'package:walleties/pages/widgets/home/intro_login.dart';
 import 'package:walleties/pages/widgets/home/sign_in.dart';
 import 'package:walleties/pages/widgets/home/tab_bar_login.dart';
@@ -25,6 +29,9 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final model = Provider.of<MainViewModel>(context);
+    final fmodel = Provider.of<FirestoreModel>(context);
+
     return DefaultTabController(
       length: 2,
       child: Scaffold(
@@ -47,25 +54,28 @@ class _HomePageState extends State<HomePage> {
                 padding: EdgeInsets.symmetric(horizontal: 50),
                 alignment: Alignment.center,
                 color: Colors.white.withOpacity(0.9),
-                child: ScrollConfiguration(
-                  behavior: MyBehavior(),
-                  child: ListView(
-                    controller: _controller,
-                    shrinkWrap: true,
-                    padding: EdgeInsets.only(top: 20, bottom: 80),
-                    children: <Widget>[
-                      NavBarResponsive(),
-                      SizedBox(height: 80),
-                      Container(
-                        width: double.infinity,
-                        alignment: Alignment.center,
-                        child: HomeContent(),
-                      ),
-                    ],
-                  ),
-                ),
+                child: model.currentHomeWidget == 0
+                    ? ScrollConfiguration(
+                        behavior: MyBehavior(),
+                        child: ListView(
+                          controller: _controller,
+                          shrinkWrap: true,
+                          padding: EdgeInsets.only(top: 20, bottom: 80),
+                          children: <Widget>[
+                            NavBarResponsive(),
+                            SizedBox(height: 80),
+                            Container(
+                              width: double.infinity,
+                              alignment: Alignment.center,
+                              child: HomeContent(),
+                            ),
+                          ],
+                        ),
+                      )
+                    : AboutInfo(),
               ),
             ),
+            !(fmodel.waiting) ? CircularProgressIndicator() : Container()
           ],
         ),
       ),

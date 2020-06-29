@@ -1,6 +1,7 @@
 import 'dart:html';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:walleties/model/card_validation_model.dart';
 import 'package:walleties/model/firestore_model.dart';
@@ -258,6 +259,21 @@ class AddCardField extends StatelessWidget {
         cursorStyle: CustomCursor.text,
         child: TextFormField(
           controller: _controller,
+          inputFormatters: _index == 1
+              ? [
+                  MaskedTextInputFormatter(
+                    mask: 'xxxx-xxxx-xxxx-xxxx',
+                    separator: '-',
+                  ),
+                ]
+              : _index == 2
+                  ? [
+                      MaskedTextInputFormatter(
+                        mask: 'xx/xx',
+                        separator: '/',
+                      ),
+                    ]
+                  : [],
           decoration: InputDecoration(
             hintText: _hint,
             labelText: _label,

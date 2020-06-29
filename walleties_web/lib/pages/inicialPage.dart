@@ -44,6 +44,12 @@ class InicialPage extends StatelessWidget {
                   : Container(),
             ),
           ),
+          !(fmodel.waiting)
+              ? Container(
+                  color: Colors.black.withOpacity(0.5),
+                  child: Center(child: CircularProgressIndicator()),
+                )
+              : Container()
         ],
       ),
     );

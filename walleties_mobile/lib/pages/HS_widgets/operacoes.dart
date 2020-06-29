@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:walleties_mobile/colors/colors.dart';
 import 'package:walleties_mobile/models/main_view_model.dart';
 
 class Operacoes extends StatefulWidget {
@@ -39,6 +40,17 @@ class _OperacoesState extends State<Operacoes> {
       [_nomeController, _cpfController, _agenciaController, _contaController],
       [_valorController]
     ];
+  }
+
+  @override
+  void dispose() {
+    _nomeController.dispose();
+    _cpfController.dispose();
+    _valorController.dispose();
+    _boletoController.dispose();
+    _agenciaController.dispose();
+    _contaController.dispose();
+    super.dispose();
   }
 
   @override
@@ -111,26 +123,43 @@ class SendButton extends StatelessWidget {
             ),
           ),
           onPressed: () async {
-            var res;
-            var text = double.parse(
-                controller[0].text.replaceAll('.', '').replaceAll(',', '.'));
-            if (index == 0) {
-              res = await model.ops_dep_pag(text, 0);
-              if (res) {
-                model.getUserContas();
-                Navigator.of(context).pop();
-                showDialog(context: context, child: OpDialog(text, 0));
-              } else {
-                showDialog(context: context, child: OpDialog(text, 2));
-              }
-            } else if (index == 1) {
-              res = await model.ops_dep_pag(text, 1);
-              if (res) {
-                model.getUserContas();
-                Navigator.of(context).pop();
-                showDialog(context: context, child: OpDialog(text, 1));
-              } else {
-                showDialog(context: context, child: OpDialog(text, 2));
+            if (model.cobMoney == "inválido") {
+              showDialog(context: context, child: OpDialog(0, 2));
+            } else {
+              if (controller[0].text.isNotEmpty) {
+                var res;
+                var text = double.parse(controller[0]
+                    .text
+                    .replaceAll('.', '')
+                    .replaceAll(',', '.'));
+                if (index == 0) {
+                  bool res = await model.ops_dep_pag(text, 0);
+                  if (res) {
+                    model.getUserContas();
+                    Navigator.of(context).pop();
+                    showDialog(context: context, child: OpDialog(text, 0));
+                  } else {
+                    showDialog(context: context, child: OpDialog(text, 2));
+                  }
+                } else if (index == 1) {
+                  bool aux = model.checkOpPagDisponivel(double.parse(
+                      controller[0]
+                          .text
+                          .replaceAll('.', '')
+                          .replaceAll(',', '.')));
+                  if (aux) {
+                    res = await model.ops_dep_pag(text, 1);
+                    if (res) {
+                      model.getUserContas();
+                      Navigator.of(context).pop();
+                      showDialog(context: context, child: OpDialog(text, 1));
+                    } else {
+                      showDialog(context: context, child: OpDialog(text, 2));
+                    }
+                  } else {
+                    showDialog(context: context, child: OpDialog(0, 4));
+                  }
+                }
               }
             }
           },
@@ -155,12 +184,19 @@ class OpDialog extends StatelessWidget {
             ? "Depósito de ${value} realizado com sucesso!"
             : type == 1
                 ? "Pagamento de ${value} realizado com sucesso!"
-                : "Não foi possível completar a operação.";
+                : type == 2
+                    ? "Não foi possível completar a operação."
+                    : type == 3
+                        ? "Valor total difere do valor da compra."
+                        : type == 4
+                            ? "Limite Indisponível."
+                            : "Valor Inválido.";
       } catch (e) {}
     }
 
     return AlertDialog(
-      title: Text(type != 2 ? "Operação Concluída!" : "Operação Falhou."),
+      title: Text(
+          type == 0 || type == 1 ? "Operação Concluída!" : "Operação Falhou."),
       content: Text(getText()),
       actions: [
         RaisedButton(
@@ -211,8 +247,8 @@ class OpPagamento extends StatelessWidget {
       children: [
         AddCardField(
           controller: controllers[0],
-          hint: "00000.00000 00000.000000 00000.000000 0 00000000000000",
-          label: "Código de Barras",
+          hint: "10,00",
+          label: "Valor",
         ),
       ],
     );
@@ -285,7 +321,7 @@ class OpTransferencia extends StatelessWidget {
 }
 
 class AddCardField extends StatelessWidget {
-  const AddCardField({
+  AddCardField({
     @required TextEditingController controller,
     @required String hint,
     @required String label,
@@ -299,25 +335,47 @@ class AddCardField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final model = Provider.of<MainViewModel>(context);
+    NumberFormat oCcy = new NumberFormat.currency(locale: 'eu', symbol: "");
+    // String money;
+
     return Container(
       padding: EdgeInsets.only(top: 15),
       child: TextFormField(
         controller: _controller,
-        inputFormatters: <TextInputFormatter>[
+        inputFormatters: [
           _label == "Valor"
-              ? WhitelistingTextInputFormatter(RegExp("[0-9,]"))
-              : _label == "Código de Barras"
-                  ? WhitelistingTextInputFormatter(RegExp("[0-9. ]"))
-                  : BlacklistingTextInputFormatter(RegExp("[,.]")),
+              ? WhitelistingTextInputFormatter(RegExp("[0-9,.]"))
+              : BlacklistingTextInputFormatter(RegExp("[,.]")),
         ],
         decoration: InputDecoration(
           hintText: _hint,
           labelText: _label,
+          counter: Text(
+            "R\$ " + model.cobMoney,
+            style: TextStyle(
+              fontSize: 16,
+              color: weirdBlue,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(5),
           ),
           contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: 10),
         ),
+        onChanged: (value) {
+          try {
+            model.updateCobMoney(oCcy.format(double.parse(
+                _controller.text.replaceAll(".", "").replaceAll(",", "."))));
+          } catch (e) {
+            if (_controller.text.isEmpty) {
+              model.updateCobMoney("0,00");
+            } else {
+              model.updateCobMoney("inválido");
+            }
+          }
+        },
       ),
     );
   }

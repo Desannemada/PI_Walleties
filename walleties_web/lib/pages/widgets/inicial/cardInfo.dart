@@ -46,6 +46,32 @@ class CardInfo extends StatelessWidget {
           .format(result);
     }
 
+    String getTotalFatura(String mes) {
+      String date;
+      if (model.getMonthInt(mes) < 10) {
+        date = mes.substring(mes.length - 4) +
+            "-0" +
+            model.getMonthInt(mes).toString();
+      } else {
+        date = mes.substring(mes.length - 4) +
+            "-" +
+            model.getMonthInt(mes).toString();
+      }
+      double result = 0;
+      for (var compra in fmodel.faturaCredito) {
+        if (compra['name_bank'] ==
+                fmodel.userCards[fmodel.currentOption[0] - 1][4] &&
+            compra['data'].substring(0, 7) == date) {
+          result = result +
+              double.parse(
+                  compra['valor'].replaceAll('.', '').replaceAll(',', '.'));
+        }
+      }
+
+      return NumberFormat.currency(locale: "pt_br", symbol: 'R\$ ')
+          .format(result);
+    }
+
     List<Shadow> shadows = [
       Shadow(
         blurRadius: 2.0,
@@ -236,24 +262,37 @@ class CardInfo extends StatelessWidget {
                                       ),
                                     ),
                                     SizedBox(height: 10),
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: <Widget>[
-                                        InfoTexts(
-                                          text: "Março 2020",
-                                          size: 14,
-                                          hover: false,
-                                          shadows: false,
+                                    Column(
+                                      children: List.generate(
+                                        model
+                                            .past_future_faturas[
+                                                fmodel.currentOption[0] - 1][0]
+                                            .length,
+                                        (index) => Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: <Widget>[
+                                            InfoTexts(
+                                              text: model.past_future_faturas[
+                                                  fmodel.currentOption[0] -
+                                                      1][0][index],
+                                              size: 14,
+                                              hover: false,
+                                              shadows: false,
+                                            ),
+                                            InfoTexts(
+                                              text: getTotalFatura(
+                                                  model.past_future_faturas[
+                                                      fmodel.currentOption[0] -
+                                                          1][0][index]),
+                                              size: 16,
+                                              hover: false,
+                                              weight: FontWeight.bold,
+                                              shadows: false,
+                                            ),
+                                          ],
                                         ),
-                                        InfoTexts(
-                                          text: "NA" + " ",
-                                          size: 16,
-                                          hover: false,
-                                          weight: FontWeight.bold,
-                                          shadows: false,
-                                        ),
-                                      ],
+                                      ),
                                     ),
                                     SizedBox(height: 30),
                                     Align(
@@ -268,44 +307,37 @@ class CardInfo extends StatelessWidget {
                                       ),
                                     ),
                                     SizedBox(height: 10),
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: <Widget>[
-                                        InfoTexts(
-                                          text: "Maio 2020",
-                                          size: 14,
-                                          hover: false,
-                                          shadows: false,
+                                    Column(
+                                      children: List.generate(
+                                        model
+                                            .past_future_faturas[
+                                                fmodel.currentOption[0] - 1][1]
+                                            .length,
+                                        (index) => Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: <Widget>[
+                                            InfoTexts(
+                                              text: model.past_future_faturas[
+                                                  fmodel.currentOption[0] -
+                                                      1][1][index],
+                                              size: 14,
+                                              hover: false,
+                                              shadows: false,
+                                            ),
+                                            InfoTexts(
+                                              text: getTotalFatura(
+                                                  model.past_future_faturas[
+                                                      fmodel.currentOption[0] -
+                                                          1][1][index]),
+                                              size: 16,
+                                              hover: false,
+                                              weight: FontWeight.bold,
+                                              shadows: false,
+                                            ),
+                                          ],
                                         ),
-                                        InfoTexts(
-                                          text: "NA" + " ",
-                                          size: 16,
-                                          hover: false,
-                                          weight: FontWeight.bold,
-                                          shadows: false,
-                                        ),
-                                      ],
-                                    ),
-                                    SizedBox(height: 5),
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: <Widget>[
-                                        InfoTexts(
-                                          text: "Junho 2020",
-                                          size: 14,
-                                          hover: false,
-                                          shadows: false,
-                                        ),
-                                        InfoTexts(
-                                          text: "NA" + " ",
-                                          size: 16,
-                                          hover: false,
-                                          weight: FontWeight.bold,
-                                          shadows: false,
-                                        ),
-                                      ],
+                                      ),
                                     ),
                                   ],
                                 ),

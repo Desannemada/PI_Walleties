@@ -81,21 +81,91 @@ class CardManager extends StatelessWidget {
                                 ),
                                 IconButton(
                                   icon: Icon(Icons.delete),
-                                  onPressed: () async {
-                                    var res = await model.deleteCard(index - 1);
+                                  onPressed: () {
                                     showDialog(
-                                        context: context,
-                                        builder: (context) {
-                                          Future.delayed(Duration(seconds: 1),
-                                              () {
-                                            Navigator.of(context).pop(true);
-                                          });
-                                          return ResultDeleteDialog(
-                                            res
-                                                ? "Conta removida com sucesso!"
-                                                : "Não foi possível completar a operação!",
-                                          );
-                                        });
+                                      context: context,
+                                      child: AlertDialog(
+                                          title: Text(
+                                            "Deletando cartão",
+                                            style: TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                          content: RichText(
+                                            text: TextSpan(
+                                              text:
+                                                  "Tem certeza que deseja deletar o cartão\n",
+                                              style: TextStyle(
+                                                color: Colors.black,
+                                                fontFamily: "Open Sans",
+                                              ),
+                                              children: <TextSpan>[
+                                                TextSpan(
+                                                  text: model.userCards[index]
+                                                      [1],
+                                                  style: TextStyle(
+                                                    fontWeight: FontWeight.w600,
+                                                    color: Colors.black,
+                                                    fontFamily: "Open Sans",
+                                                  ),
+                                                ),
+                                                TextSpan(
+                                                  text: " ?",
+                                                  style: TextStyle(
+                                                    color: Colors.black,
+                                                    fontFamily: "Open Sans",
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                          actions: [
+                                            FlatButton(
+                                              onPressed: () async {
+                                                var res = await model
+                                                    .deleteCard(index);
+                                                if (res) {
+                                                  model.updateCurrentOption(0);
+                                                  Navigator.of(context).pop();
+                                                }
+                                                showDialog(
+                                                    context: context,
+                                                    builder: (context) {
+                                                      Future.delayed(
+                                                          Duration(seconds: 1),
+                                                          () {
+                                                        Navigator.of(context)
+                                                            .pop(true);
+                                                      });
+                                                      return ResultDeleteDialog(
+                                                        res
+                                                            ? "Conta removida com sucesso!"
+                                                            : "Não foi possível completar a operação!",
+                                                      );
+                                                    });
+                                              },
+                                              child: Text(
+                                                "SIM",
+                                                style: TextStyle(
+                                                  color: darkGreen,
+                                                  fontWeight: FontWeight.w600,
+                                                ),
+                                              ),
+                                            ),
+                                            FlatButton(
+                                              onPressed: () =>
+                                                  Navigator.of(context).pop(),
+                                              child: Text(
+                                                "NÃO",
+                                                style: TextStyle(
+                                                  color: darkGreen,
+                                                  fontWeight: FontWeight.w600,
+                                                ),
+                                              ),
+                                            ),
+                                          ]),
+                                    );
                                   },
                                 )
                               ],

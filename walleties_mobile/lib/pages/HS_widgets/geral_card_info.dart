@@ -17,31 +17,64 @@ class _GeralCardInfoState extends State<GeralCardInfo> {
   Widget build(BuildContext context) {
     final model = Provider.of<MainViewModel>(context);
 
-    String getSingular(int i, int index) {
-      double result = 0;
-      if (index == 0) {
-        result = double.parse(
-            model.userCards[i][8].replaceAll('.', '').replaceAll(',', '.'));
-      } else if (index == 1) {
-        for (var compra in model.faturaCredito) {
-          if (compra['name_bank'] == model.userCards[i][4]) {
-            result = result +
-                double.parse(
-                    compra['valor'].replaceAll('.', '').replaceAll(',', '.'));
-          }
+    String getInfo(int index) {
+      double result = 0.0;
+      for (var compra in model.faturaCredito) {
+        if (compra['name_bank'] ==
+            model.userCards[model.currentOption[0] - 1][4]) {
+          result = result +
+              double.parse(
+                  compra['valor'].replaceAll('.', '').replaceAll(',', '.'));
         }
-      } else if (index == 2) {
-        result = result +
-            double.parse(
-                model.userCards[i][9].replaceAll('.', '').replaceAll(',', '.'));
       }
+      if (index == 0) {
+        result = double.parse(model.userCards[model.currentOption[0] - 1][8]
+            .replaceAll('.', '')
+            .replaceAll(',', '.'));
+        return NumberFormat.currency(locale: "pt_br", symbol: 'R\$ ')
+            .format(result);
+      } else if (index == 1) {
+        return NumberFormat.currency(locale: "pt_br", symbol: 'R\$ ')
+            .format(result);
+      } else if (index == 2) {
+        double limite = double.parse(model.userCards[model.currentOption[0] - 1]
+                [9]
+            .replaceAll('.', '')
+            .replaceAll(',', '.'));
+        return NumberFormat.currency(locale: "pt_br", symbol: 'R\$ ')
+            .format(limite - result);
+      }
+    }
+
+    String getTotalFatura(String mes) {
+      String date;
+      if (model.getMonthInt(mes) < 10) {
+        date = mes.substring(mes.length - 4) +
+            "-0" +
+            model.getMonthInt(mes).toString();
+      } else {
+        date = mes.substring(mes.length - 4) +
+            "-" +
+            model.getMonthInt(mes).toString();
+      }
+      double result = 0;
+      for (var compra in model.faturaCredito) {
+        if (compra['name_bank'] ==
+                model.userCards[model.currentOption[0] - 1][4] &&
+            compra['data'].substring(0, 7) == date) {
+          result = result +
+              double.parse(
+                  compra['valor'].replaceAll('.', '').replaceAll(',', '.'));
+        }
+      }
+
       return NumberFormat.currency(locale: "pt_br", symbol: 'R\$ ')
           .format(result);
     }
 
     return GestureDetector(
       onTap: () {
-        model.updateWhichAbaFatura();
+        model.updateWhichAbaFatura(!model.whichAbaFatura);
       },
       child: Container(
         margin: EdgeInsets.symmetric(horizontal: 10),
@@ -75,7 +108,25 @@ class _GeralCardInfoState extends State<GeralCardInfo> {
             SizedBox(height: 10),
             Column(
               children: List.generate(
-                !model.whichAbaFatura ? 3 : 2,
+                !model.whichAbaFatura &&
+                        model.currentMonth ==
+                            model.getMonth(DateTime.now().month) +
+                                " " +
+                                DateTime.now().year.toString()
+                    ? 3
+                    : model.whichAbaFatura &&
+                            model.currentMonth ==
+                                model.getMonth(DateTime.now().month) +
+                                    " " +
+                                    DateTime.now().year.toString()
+                        ? 2
+                        : model.whichAbaFatura &&
+                                !(model.currentMonth ==
+                                    model.getMonth(DateTime.now().month) +
+                                        " " +
+                                        DateTime.now().year.toString())
+                            ? 1
+                            : 2,
                 (index) => Padding(
                   padding: const EdgeInsets.only(bottom: 8),
                   child: Row(
@@ -96,10 +147,40 @@ class _GeralCardInfoState extends State<GeralCardInfo> {
                         ),
                       ),
                       InfoTexts(
-                        text: !model.whichAbaFatura
-                            ? getSingular(model.currentOption[0] - 1, index)
-                            : getSingular(
-                                model.currentOption[0] - 1, index + 1),
+                        text: !model.whichAbaFatura &&
+                                model.currentMonth ==
+                                    model.getMonth(DateTime.now().month) +
+                                        " " +
+                                        DateTime.now().year.toString()
+                            ? getInfo(index)
+                            : model.whichAbaFatura &&
+                                    model.currentMonth ==
+                                        model.getMonth(DateTime.now().month) +
+                                            " " +
+                                            DateTime.now().year.toString()
+                                ? getInfo(index + 1)
+                                : model.whichAbaFatura &&
+                                        !(model.currentMonth ==
+                                            model.getMonth(
+                                                    DateTime.now().month) +
+                                                " " +
+                                                DateTime.now().year.toString())
+                                    ? getTotalFatura(model.currentMonth)
+                                    : index == 0
+                                        ? getInfo(index)
+                                        : getTotalFatura(model.currentMonth),
+                        // text: model.currentMonth ==
+                        //         model.getMonth(DateTime.now().month) +
+                        //             " " +
+                        //             DateTime.now().year.toString()
+                        //     ? getInfo(0)
+                        //     : getTotalFatura(model.currentMonth),
+                        // text: !model.whichAbaFatura
+                        //     ? index == 1
+                        //         ? getTotalFatura(model.currentMonth)
+                        //         : getSingular(model.currentOption[0] - 1, index)
+                        //     : getSingular(
+                        //         model.currentOption[0] - 1, index + 1),
                         hover: true,
                         size: 18,
                         weight: FontWeight.w600,

@@ -100,9 +100,11 @@ class _GeneralInfoState extends State<GeneralInfo> {
                                       ),
                                       onTap: () {
                                         fmodel.updateCurrentOption(index + 1);
-                                        // amodel.updateCurrentAccount(fmodel
-                                        //         .userCards[
-                                        //     fmodel.currentOption[0] - 1][1]);
+                                        model.updateCardMonths(fmodel.fMonths);
+                                        model.updateCurrentMonth(model.getMonth(
+                                                DateTime.now().month) +
+                                            " " +
+                                            DateTime.now().year.toString());
                                       },
                                     ),
                                   ),
@@ -182,8 +184,11 @@ class GeneralCards extends StatelessWidget {
           }
         }
       } else if (index == 2) {
-        result = result +
-            double.parse(fmodel.userCards[i][9]
+        result = double.parse(fmodel.userCards[i][9]
+                .replaceAll('.', '')
+                .replaceAll(',', '.')) -
+            double.parse(getSingular(i, 1)
+                .substring(4)
                 .replaceAll('.', '')
                 .replaceAll(',', '.'));
       }
@@ -209,9 +214,15 @@ class GeneralCards extends StatelessWidget {
                   compra['valor'].replaceAll('.', '').replaceAll(',', '.'));
         }
       } else if (index == 2) {
-        for (var card in fmodel.userCards) {
+        for (var i = 0; i < fmodel.userCards.length; i++) {
           result = result +
-              double.parse(card[9].replaceAll('.', '').replaceAll(',', '.'));
+              (double.parse(fmodel.userCards[i][9]
+                      .replaceAll('.', '')
+                      .replaceAll(',', '.')) -
+                  double.parse(getSingular(i, 1)
+                      .substring(4)
+                      .replaceAll('.', '')
+                      .replaceAll(',', '.')));
         }
       }
       return NumberFormat.currency(locale: "pt_br", symbol: 'R\$ ')

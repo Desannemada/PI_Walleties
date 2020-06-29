@@ -18,10 +18,29 @@ class _SignInState extends State<SignIn> {
   TextEditingController _passwordController;
   TextEditingController _confirmPasswordController;
 
+  final FocusNode _emailFocus = new FocusNode();
+  final FocusNode _passwordFocus = new FocusNode();
+  final FocusNode _confirmPasswordFocus = new FocusNode();
+
   bool _showPassword = true;
   bool _showConfirmPassword = true;
+  bool waiting = false;
 
   String error = "";
+
+  _fieldFocusChange(
+      BuildContext context, FocusNode currentFocus, FocusNode nextFocus) {
+    currentFocus.unfocus();
+    FocusScope.of(context).requestFocus(nextFocus);
+  }
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    _confirmPasswordController.dispose();
+    super.dispose();
+  }
 
   @override
   void initState() {
@@ -35,168 +54,227 @@ class _SignInState extends State<SignIn> {
   Widget build(BuildContext context) {
     final model = Provider.of<MainViewModel>(context);
 
-    return Container(
-      width: double.infinity,
-      child: Column(
-        children: [
-          Container(
-            height: 64,
-            child: Stack(
-              children: [
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: IconButton(
-                    icon: Icon(
-                      Icons.arrow_back,
-                      size: 35,
+    return Stack(
+      children: [
+        Container(
+          width: double.infinity,
+          child: Column(
+            children: [
+              Container(
+                height: 64,
+                child: Stack(
+                  children: [
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: IconButton(
+                        icon: Icon(
+                          Icons.arrow_back,
+                          size: 35,
+                        ),
+                        onPressed: () =>
+                            model.changeAtualLoginWidget(LoginScreenMenu()),
+                      ),
                     ),
-                    onPressed: () =>
-                        model.changeAtualLoginWidget(LoginScreenMenu()),
-                  ),
+                    Logo(),
+                  ],
                 ),
-                Logo(),
-              ],
-            ),
-          ),
-          Expanded(
-            child: Form(
-              key: _formKey,
-              child: ListView(
-                shrinkWrap: true,
-                children: [
-                  Text(
-                    error != null ? error.isNotEmpty ? "*" + error : "" : "",
-                    style: TextStyle(
-                      color: Colors.red,
-                    ),
-                  ),
-                  SizedBox(height: 5),
-                  TextFormField(
-                    controller: _emailController,
-                    decoration: InputDecoration(
-                      prefixIcon: Icon(
-                        Icons.email,
-                      ),
-                      hintText: "Email",
-                    ),
-                    validator: (value) {
-                      return value.isEmpty ? '*Campo obrigatório' : null;
-                    },
-                  ),
-                  SizedBox(height: 20),
-                  TextFormField(
-                    controller: _passwordController,
-                    obscureText: _showPassword,
-                    decoration: InputDecoration(
-                      prefixIcon: Icon(
-                        Icons.lock,
-                      ),
-                      hintText: "Senha",
-                      suffixIcon: IconButton(
-                        icon: Icon(_showPassword
-                            ? Icons.visibility_off
-                            : Icons.visibility),
-                        onPressed: () {
-                          setState(
-                            () {
-                              _showPassword = !_showPassword;
-                            },
-                          );
-                        },
-                      ),
-                    ),
-                    validator: (value) {
-                      return value.isEmpty ? '*Campo obrigatório' : null;
-                    },
-                  ),
-                  SizedBox(height: 20),
-                  TextFormField(
-                    controller: _confirmPasswordController,
-                    obscureText: _showConfirmPassword,
-                    decoration: InputDecoration(
-                      prefixIcon: Icon(
-                        Icons.lock,
-                      ),
-                      hintText: "Confirmar Senha",
-                      suffixIcon: IconButton(
-                        icon: Icon(_showConfirmPassword
-                            ? Icons.visibility_off
-                            : Icons.visibility),
-                        onPressed: () {
-                          setState(
-                            () {
-                              _showConfirmPassword = !_showConfirmPassword;
-                            },
-                          );
-                        },
-                      ),
-                    ),
-                    validator: (value) {
-                      if (value.isEmpty) {
-                        return '*Campo obrigatório';
-                      } else if (_passwordController.text !=
-                          _confirmPasswordController.text) {
-                        return '*Campos de senha devem ser iguais';
-                      }
-                      return null;
-                    },
-                  ),
-                  SizedBox(height: 30),
-                  Container(
-                    padding: EdgeInsets.symmetric(horizontal: 10),
-                    width: double.infinity,
-                    child: RaisedButton(
-                      onPressed: () async {
-                        if (_formKey.currentState.validate()) {
-                          String res = await AuthProvider().signup(
-                              _emailController.text, _passwordController.text);
-                          if (res == "Ok") {
-                            setState(() {
-                              error = "";
-                            });
-                            print("User cadastrado: " +
-                                _emailController.text +
-                                " " +
-                                _passwordController.text);
-                            model.updateUserInfo();
-                            showDialog(
-                              context: context,
-                              child: SignInDialog(),
-                            );
-                          } else {
-                            print("Cadastro ERRO");
-                            setState(() {
-                              error = res;
-                            });
-                          }
-                        }
-                      },
-                      child: Text(
-                        'Registrar',
+              ),
+              Expanded(
+                child: Form(
+                  key: _formKey,
+                  child: ListView(
+                    shrinkWrap: true,
+                    children: [
+                      Text(
+                        error != null
+                            ? error.isNotEmpty ? "*" + error : ""
+                            : "",
                         style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600,
+                          color: Colors.red,
                         ),
                       ),
-                    ),
+                      SizedBox(height: 5),
+                      TextFormField(
+                        controller: _emailController,
+                        focusNode: _emailFocus,
+                        textInputAction: TextInputAction.next,
+                        decoration: InputDecoration(
+                          prefixIcon: Icon(
+                            Icons.email,
+                          ),
+                          hintText: "Email",
+                        ),
+                        validator: (value) {
+                          return value.isEmpty ? '*Campo obrigatório' : null;
+                        },
+                        onFieldSubmitted: (value) {
+                          _fieldFocusChange(
+                              context, _emailFocus, _passwordFocus);
+                        },
+                      ),
+                      SizedBox(height: 20),
+                      TextFormField(
+                        controller: _passwordController,
+                        obscureText: _showPassword,
+                        focusNode: _passwordFocus,
+                        textInputAction: TextInputAction.next,
+                        decoration: InputDecoration(
+                          prefixIcon: Icon(
+                            Icons.lock,
+                          ),
+                          hintText: "Senha",
+                          suffixIcon: IconButton(
+                            icon: Icon(_showPassword
+                                ? Icons.visibility_off
+                                : Icons.visibility),
+                            onPressed: () {
+                              setState(
+                                () {
+                                  _showPassword = !_showPassword;
+                                },
+                              );
+                            },
+                          ),
+                        ),
+                        validator: (value) {
+                          return value.isEmpty ? '*Campo obrigatório' : null;
+                        },
+                        onFieldSubmitted: (value) {
+                          _fieldFocusChange(
+                              context, _passwordFocus, _confirmPasswordFocus);
+                        },
+                      ),
+                      SizedBox(height: 20),
+                      TextFormField(
+                        controller: _confirmPasswordController,
+                        obscureText: _showConfirmPassword,
+                        focusNode: _confirmPasswordFocus,
+                        textInputAction: TextInputAction.done,
+                        decoration: InputDecoration(
+                          prefixIcon: Icon(
+                            Icons.lock,
+                          ),
+                          hintText: "Confirmar Senha",
+                          suffixIcon: IconButton(
+                            icon: Icon(_showConfirmPassword
+                                ? Icons.visibility_off
+                                : Icons.visibility),
+                            onPressed: () {
+                              setState(
+                                () {
+                                  _showConfirmPassword = !_showConfirmPassword;
+                                },
+                              );
+                            },
+                          ),
+                        ),
+                        validator: (value) {
+                          if (value.isEmpty) {
+                            return '*Campo obrigatório';
+                          } else if (_passwordController.text !=
+                              _confirmPasswordController.text) {
+                            return '*Campos de senha devem ser iguais';
+                          }
+                          return null;
+                        },
+                        onFieldSubmitted: (value) async {
+                          if (_formKey.currentState.validate()) {
+                            setState(() {
+                              waiting = true;
+                            });
+                            String res = await AuthProvider().signup(
+                                _emailController.text,
+                                _passwordController.text);
+                            if (res == "Ok") {
+                              setState(() {
+                                error = "";
+                              });
+                              print("\nUser cadastrado: " +
+                                  _emailController.text +
+                                  " " +
+                                  _passwordController.text +
+                                  "\n");
+                              model.updateisConfigDown(false);
+                              model.updateUserInfo();
+                              showDialog(
+                                context: context,
+                                child: SignInDialog(),
+                              );
+                            } else {
+                              print("\nCadastro ERRO\n");
+                              setState(() {
+                                error = res;
+                                waiting = false;
+                              });
+                            }
+                          } else {
+                            setState(() {
+                              waiting = false;
+                            });
+                          }
+                        },
+                      ),
+                      SizedBox(height: 30),
+                      Container(
+                        padding: EdgeInsets.symmetric(horizontal: 10),
+                        width: double.infinity,
+                        child: RaisedButton(
+                          onPressed: () async {
+                            if (_formKey.currentState.validate()) {
+                              setState(() {
+                                waiting = true;
+                              });
+                              String res = await AuthProvider().signup(
+                                  _emailController.text,
+                                  _passwordController.text);
+                              if (res == "Ok") {
+                                setState(() {
+                                  error = "";
+                                });
+                                print("\nUser cadastrado: " +
+                                    _emailController.text +
+                                    " " +
+                                    _passwordController.text +
+                                    "\n");
+                                model.updateisConfigDown(false);
+                                model.updateUserInfo();
+                                showDialog(
+                                  context: context,
+                                  child: SignInDialog(),
+                                );
+                              } else {
+                                print("\nCadastro ERRO\n");
+                                setState(() {
+                                  error = res;
+                                  waiting = false;
+                                });
+                              }
+                            } else {
+                              setState(() {
+                                waiting = false;
+                              });
+                            }
+                          },
+                          child: Text(
+                            'Registrar',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                ],
+                ),
               ),
-            ),
+            ],
           ),
-        ],
-      ),
+        ),
+        waiting ? Center(child: CircularProgressIndicator()) : Container()
+      ],
     );
   }
-
-  // void _showSnackBar(String text) {
-  //   Scaffold.of(context).showSnackBar(
-  //     SnackBar(
-  //       content: Text(text),
-  //       behavior: SnackBarBehavior.floating,
-  //     ),
-  //   );
-  // }
 }
 
 class SignInDialog extends StatelessWidget {

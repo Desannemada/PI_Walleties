@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class CardValidationItem {
   final String value;
@@ -59,7 +60,7 @@ class CardValidationModel with ChangeNotifier {
         break;
       case 2: //Validade
         {
-          RegExp regExp = new RegExp(r"([0-9]{2}[/]{1}[0-9]{2})");
+          RegExp regExp = new RegExp(r"([0-9])");
           if (value.length == 5 && regExp.hasMatch(value)) {
             cvi[2] = CardValidationItem(value, null);
           } else {
@@ -79,10 +80,10 @@ class CardValidationModel with ChangeNotifier {
         break;
       case 4: //Agência
         {
-          if (value != "") {
+          if (value != "" && double.tryParse(value) != null) {
             cvi[4] = CardValidationItem(value, null);
           } else {
-            cvi[4] = CardValidationItem(null, "Campo obrigatório");
+            cvi[4] = CardValidationItem(null, "Formato inválido");
           }
         }
         break;
@@ -91,7 +92,7 @@ class CardValidationModel with ChangeNotifier {
           if (value != "") {
             cvi[5] = CardValidationItem(value, null);
           } else {
-            cvi[5] = CardValidationItem(null, "Campo obrigatório");
+            cvi[5] = CardValidationItem(null, "Formato inválido");
           }
         }
         break;
@@ -111,5 +112,39 @@ class CardValidationModel with ChangeNotifier {
       CardValidationItem(null, null)
     ];
     notifyListeners();
+  }
+}
+
+class MaskedTextInputFormatter extends TextInputFormatter {
+  final String mask;
+  final String separator;
+
+  MaskedTextInputFormatter({
+    @required this.mask,
+    @required this.separator,
+  }) {
+    assert(mask != null);
+    assert(separator != null);
+  }
+
+  @override
+  TextEditingValue formatEditUpdate(
+      TextEditingValue oldValue, TextEditingValue newValue) {
+    if (newValue.text.length > 0) {
+      if (newValue.text.length > oldValue.text.length) {
+        if (newValue.text.length > mask.length) return oldValue;
+        if (newValue.text.length < mask.length &&
+            mask[newValue.text.length - 1] == separator) {
+          return TextEditingValue(
+            text:
+                '${oldValue.text}$separator${newValue.text.substring(newValue.text.length - 1)}',
+            selection: TextSelection.collapsed(
+              offset: newValue.selection.end + 1,
+            ),
+          );
+        }
+      }
+    }
+    return newValue;
   }
 }

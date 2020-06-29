@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:walleties/model/firestore_model.dart';
+import 'package:walleties/model/main_view_model.dart';
 import 'package:walleties/pages/extra/custom_cursor.dart';
 
 class CreditoDebitoInfo extends StatelessWidget {
@@ -49,7 +50,6 @@ class CreditoDebitoInfo extends StatelessWidget {
                       type: type,
                       index: index,
                     )
-                    // Text("Not connected yet")
                   ],
                 ),
               ),
@@ -70,6 +70,7 @@ class CredDebFatura extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final fmodel = Provider.of<FirestoreModel>(context);
+    final model = Provider.of<MainViewModel>(context);
 
     return SizedBox(
       height: type != 1 ? 605 : 305,
@@ -78,13 +79,15 @@ class CredDebFatura extends StatelessWidget {
         itemCount: index == 0
             ? fmodel.faturaCredito.length
             : fmodel.faturaDebito.length,
-        // separatorBuilder: (context, i) => SizedBox(height: 20),
         itemBuilder: (context, i) {
           bool aux = false;
           List aux2 = [];
           if (index == 0) {
             if (fmodel.faturaCredito[i]['name_bank'] ==
-                fmodel.userCards[fmodel.currentOption[0] - 1][4]) {
+                    fmodel.userCards[fmodel.currentOption[0] - 1][4] &&
+                model.getMonthYear(
+                        fmodel.faturaCredito[i]['data'].substring(0, 7)) ==
+                    model.currentMonth) {
               aux = true;
               aux2 = [
                 (fmodel.faturaCredito[i]['data']).substring(0, 10),
@@ -98,7 +101,10 @@ class CredDebFatura extends StatelessWidget {
           }
           if (index == 1) {
             if (fmodel.faturaDebito[i]['name_bank'] ==
-                fmodel.userCards[fmodel.currentOption[0] - 1][4]) {
+                    fmodel.userCards[fmodel.currentOption[0] - 1][4] &&
+                model.getMonthYear(
+                        fmodel.faturaDebito[i]['data'].substring(0, 7)) ==
+                    model.currentMonth) {
               aux = true;
               aux2 = [
                 (fmodel.faturaDebito[i]['data']).substring(0, 10),
@@ -110,7 +116,6 @@ class CredDebFatura extends StatelessWidget {
               ];
             }
           }
-          // print(aux2);
 
           return aux
               ? Padding(

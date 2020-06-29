@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:walleties_mobile/models/main_view_model.dart';
+import 'package:walleties_mobile/pages/login_screen.dart';
 
 class AuthProvider {
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -22,14 +23,13 @@ class AuthProvider {
                   .replaceAll("=s96-c", "")
               : "assets/profileImage.jpg"
         ];
-        print(aux);
-        // MainViewModel().updateUserInfo();
+        print("\nUserInfo: " + aux.toString() + "\n");
         return "Ok";
       } else {
         return "Error";
       }
     } catch (e) {
-      print(e.toString());
+      print("Erro SignInWithEmail: " + e.toString());
       return e.message;
     }
   }
@@ -51,10 +51,10 @@ class AuthProvider {
             : "assets/profileImage.jpg"
       ];
       // MainViewModel().updateUserInfo(aux);
-      print("Signing up sucessfull: $email and $password");
+      print("\nSigning up sucessfull: $email and $password\n");
       return "Ok";
     } catch (e) {
-      print("Signing up unsucessfull");
+      print("\nSigning up unsucessfull\n");
       return e.toString();
     }
   }
@@ -88,27 +88,19 @@ class AuthProvider {
         return "Ok";
       }
     } catch (e) {
-      print(e.toString());
+      print("\nErro LoginWithGoogle: " + e.toString() + "\n");
       return e.message;
     }
   }
 
-  Future<void> signOut() async {
+  void signOut() async {
     try {
       await _auth.signOut();
       await _googleSignIn.signOut();
+      MainViewModel().updateisConfigDown(false);
+      MainViewModel().changeAtualLoginWidget(LoginScreenMenu());
     } catch (e) {
-      print(e.toString());
+      print("\nErro Exit: " + e.toString() + "\n");
     }
   }
-
-  // Future<void> _onAuthStateChanged(FirebaseUser firebaseUser) async {
-  //   if (firebaseUser == null) {
-  //     _status = Status.Unauthenticated;
-  //   } else {
-  //     _user = firebaseUser;
-  //     _status = Status.Authenticated;
-  //   }
-  //   notifyListeners();
-  // }
 }

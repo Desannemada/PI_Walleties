@@ -48,10 +48,10 @@ class MainScreen extends StatelessWidget {
           return SplashScreen();
         }
         if (!snapshot.hasData || snapshot.data == null) {
-          print("To login screen");
+          print("\nTo Login Screen\n");
           return LoginScreen();
         }
-        print("To home screen");
+        print("\nTo Home Screen\n");
         return HomeScreen();
       },
     );

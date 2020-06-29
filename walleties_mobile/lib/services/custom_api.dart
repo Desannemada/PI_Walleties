@@ -26,7 +26,7 @@ class CustomAPI extends API {
     if (response.statusCode == 200) {
       return json.decode(response.body);
     } else {
-      print("Erro: " + response.statusCode.toString());
+      print("\nErro: " + response.statusCode.toString());
     }
   }
 
@@ -36,7 +36,7 @@ class CustomAPI extends API {
     if (response.statusCode == 200) {
       return json.decode(response.body);
     } else {
-      print("Erro: " + response.statusCode.toString());
+      print("\nErro: " + response.statusCode.toString());
     }
   }
 
@@ -46,7 +46,7 @@ class CustomAPI extends API {
     if (response.statusCode == 200) {
       return json.decode(response.body);
     } else {
-      print("Erro GETCARDSINFO: " + response.statusCode.toString());
+      print("\nErro GETCARDSINFO: " + response.statusCode.toString());
     }
   }
 
@@ -67,7 +67,7 @@ class CustomAPI extends API {
       ],
     };
     String body = json.encode(data);
-    print("NEW_USER: " + body);
+    print("\nNEW_USER: " + body + "\n");
 
     var response = await http.post(
       url,
@@ -77,7 +77,7 @@ class CustomAPI extends API {
     if (response.statusCode == 200 || response.statusCode == 201) {
       return response;
     } else {
-      print("Erro: " + response.statusCode.toString());
+      print("\nErro: " + response.statusCode.toString());
       return response;
     }
   }
@@ -98,7 +98,7 @@ class CustomAPI extends API {
     };
     // print("DATA: " + data.toString());
     String body = json.encode(data);
-    print("NEW_CARD: " + body);
+    print("\nNEW_CARD: " + body + "\n");
 
     var response = await http.post(
       url,
@@ -108,7 +108,7 @@ class CustomAPI extends API {
     if (response.statusCode == 200 || response.statusCode == 201) {
       return response;
     } else {
-      print("Erro: " + response.statusCode.toString());
+      print("\nErro: " + response.statusCode.toString());
     }
   }
 
@@ -121,7 +121,7 @@ class CustomAPI extends API {
     if (response.statusCode == 200) {
       return response;
     } else {
-      print("Erro: " + response.statusCode.toString());
+      print("\nErro: " + response.statusCode.toString());
     }
   }
 
@@ -130,7 +130,7 @@ class CustomAPI extends API {
   Future<http.Response> dep_pag(List<String> info, List<String> opInfo) async {
     var res = await deleteCard(info[9]);
     if (res.statusCode == 200 || res.statusCode == 201) {
-      print("Deletado");
+      print("\nDeletado\n");
       var urlAdd =
           "http://bankapi123.herokuapp.com/card-info/add_card/${info[0]}";
       Map data = {
@@ -153,7 +153,7 @@ class CustomAPI extends API {
         body: body,
       );
       if (response.statusCode == 200 || response.statusCode == 201) {
-        print("SALDO ATUALIZADO");
+        print("\nSALDO ATUALIZADO\n");
         var urlAddFaturaDeb =
             "http://bankapi123.herokuapp.com/card-info/Altera_fatura/${info[0]}";
         Map opdata = {
@@ -175,10 +175,64 @@ class CustomAPI extends API {
           print("ErroADDFATURA: " + response2.statusCode.toString());
         }
       } else {
-        print("ErroADDCARD: " + response.statusCode.toString());
+        print("\nErroADDCARD: " + response.statusCode.toString());
       }
     } else {
-      print("Erro ao deletar");
+      print("\nErro ao deletar");
+    }
+  }
+
+  Future<http.Response> payToCreditCard() {}
+
+  Future<dynamic> avaliarCartao(List fatura) async {
+    var url = "https://nsff-app.herokuapp.com/api/analise";
+
+    List auxFatura = [];
+    for (var item in fatura) {
+      auxFatura.add({"valor": item[0], "tipo": item[1]});
+    }
+    // print(auxFatura);
+
+    String body = json.encode(auxFatura);
+
+    var response = await http.post(
+      url,
+      headers: {"Content-Type": "application/json"},
+      body: body,
+    );
+    if (response.statusCode == 200) {
+      // print("\n\n" + json.decode(response.body).toString() + "\n\n");
+      return json.decode(response.body);
+    } else {
+      print("\nErro: " + response.statusCode.toString());
+    }
+  }
+
+  Future<http.Response> updateFat(List info) async {
+    var url =
+        "https://bankapi123.herokuapp.com/card-info/Altera_faturaCre/${info[0]}";
+    // print(url);
+    Map data = {
+      'card_fatCre': {
+        'name_bank': info[1],
+        'item': info[2],
+        'valor': info[3],
+      },
+    };
+    // print("DATA: " + data.toString());
+    String body = json.encode(data);
+    print("\nNEWFAT: " + body + "\n");
+
+    var response = await http.post(
+      url,
+      headers: {"Content-Type": "application/json"},
+      body: body,
+    );
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      return response;
+    } else {
+      print("\nErro: " + response.statusCode.toString());
+      return response;
     }
   }
 }

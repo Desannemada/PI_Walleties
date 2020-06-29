@@ -1,7 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:walleties/model/account_model.dart';
 import 'package:walleties/model/card_validation_model.dart';
 import 'package:walleties/model/firestore_model.dart';
 import 'package:walleties/model/main_view_model.dart';
@@ -20,9 +19,6 @@ void main() => runApp(
           ChangeNotifierProvider<CardValidationModel>(
             create: (_) => CardValidationModel(),
           ),
-          // ChangeNotifierProvider<AccountModel>(
-          //   create: (_) => AccountModel(),
-          // ),
         ],
         child: MyApp(),
       ),

@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-// import 'package:walleties_mobile/models/account_model.dart';
 import 'package:walleties_mobile/models/main_view_model.dart';
 import 'package:walleties_mobile/pages/HS_widgets/fatura_info.dart';
 import 'package:walleties_mobile/pages/HS_widgets/geral_card_info.dart';
@@ -12,7 +11,6 @@ class AbaCartao extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final model = Provider.of<MainViewModel>(context);
-    // final amodel = Provider.of<AccountModel>(context);
 
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 15),
@@ -51,6 +49,29 @@ class AbaCartao extends StatelessWidget {
                     ),
                   ],
                 ),
+              ),
+            ),
+          ),
+          Container(
+            margin: EdgeInsets.all(10),
+            padding: EdgeInsets.symmetric(horizontal: 15),
+            decoration: BoxDecoration(
+              color: Colors.grey[300],
+              borderRadius: BorderRadius.circular(15),
+            ),
+            child: DropdownButtonHideUnderline(
+              child: DropdownButton<String>(
+                value: model.currentMonth,
+                items: model.cardMonths[model.currentOption[0] - 1]
+                    .map((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(value),
+                  );
+                }).toList(),
+                onChanged: (String newValue) {
+                  model.updateCurrentMonth(newValue);
+                },
               ),
             ),
           ),

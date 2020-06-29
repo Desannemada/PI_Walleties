@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:intl/intl.dart';
 import 'package:walleties/colors/colors.dart';
+import 'package:walleties/model/main_view_model.dart';
 import 'package:walleties/pages/extra/my_flutter_app_icons.dart';
 import 'package:walleties/services/custom_api.dart';
 
@@ -108,14 +109,12 @@ class FirestoreModel with ChangeNotifier {
     notifyListeners();
   }
 
-  // List<dynamic> _faturas;
-
   void getUserContas() async {
     print("Getting User Cards Info");
     resetCards();
 
     var contas = await api.getCardsInfo(userInfo[1]);
-    print("CONTAS ->> " + contas.toString());
+    print("\nCONTAS ->> " + contas.toString());
     if (contas != null) {
       for (var item in contas) {
         updateOptions(item['name_bank']);
@@ -132,30 +131,18 @@ class FirestoreModel with ChangeNotifier {
           item['limite'],
         ]);
       }
-      // print(userCards);
-      getCredito();
-      getDebito();
+      for (var i = 0; i < _options.length; i++) {
+        if (_options[i][1] == currentOption[1]) {
+          updateCurrentOption(i);
+          break;
+        }
+      }
+      getDebitoCredito();
       updateUserContas(contas.length);
     } else {
       updateUserContas(0);
+      updateWaiting(true);
     }
-
-    // var fatura = await api.getFatura(userInfo[1]);
-
-    // DocumentReference documentReference =
-    //     Firestore.instance.collection("usuarios").document(userInfo[2]);
-    // documentReference.get().then((datasnapshot) {
-    //   if (datasnapshot.exists) {
-    //     resetCards();
-    //     for (var key in datasnapshot.data.keys) {
-    //       updateOptions(datasnapshot.data[key.toString()][4].toString());
-    //       updateUserCards(datasnapshot.data[key]);
-    //     }
-    //     updateUserContas(datasnapshot.data.keys.length);
-    //   } else {
-    //     print("no");
-    //   }
-    // });
   }
 
   Future<bool> addCard(String nome, String numeroCartao, String validade,
@@ -170,15 +157,7 @@ class FirestoreModel with ChangeNotifier {
       agencia,
       conta
     ];
-    // Firestore.instance
-    //     .collection('usuarios')
-    //     .document(userInfo[2])
-    //     .setData({numeroCartao: data}, merge: true).then((value) {
-    //   resetCards();
-    //   getUserContas();
-    // }, onError: () {
-    //   print("Erro");
-    // });
+
     if (userCards.isEmpty) {
       print("AddCard: Trying to add new user");
       var res = await api.addNewUser(data);
@@ -186,6 +165,7 @@ class FirestoreModel with ChangeNotifier {
         print("AddCard: Error new user, trying new card");
         var res2 = await api.addNewCard(data);
         if (res2.statusCode == 200 || res2.statusCode == 201) {
+          getUserContas();
           return true;
         } else {
           return false;
@@ -207,12 +187,6 @@ class FirestoreModel with ChangeNotifier {
   }
 
   Future<bool> deleteCard(int index) async {
-    // Firestore.instance.collection('usuarios').document(userInfo[2]).updateData(
-    //     {userCards[index][1]: FieldValue.delete()}).whenComplete(() {
-    //   print("Deletado");
-    //   resetCards();
-    //   getUserContas();
-    // });
     var res = await api.deleteCard(userCards[index][7]);
     if (res.statusCode == 200 || res.statusCode == 201) {
       print("Deletado");
@@ -226,25 +200,72 @@ class FirestoreModel with ChangeNotifier {
   }
 
   List faturaDebito = [];
-
-  void getDebito() async {
-    faturaDebito = await api.getFaturaDebito(userInfo[1]);
-    faturaDebito = faturaDebito.reversed.toList();
-    notifyListeners();
-
-    print("\nFATURA-DEBITO: " + faturaDebito.toString() + "\n");
-  }
-
   List faturaCredito = [];
 
-  void getCredito() async {
+  void getDebitoCredito() async {
+    faturaDebito = await api.getFaturaDebito(userInfo[1]);
+    faturaDebito = faturaDebito.reversed.toList();
     faturaCredito = await api.getFaturaCredito(userInfo[1]);
     faturaCredito = faturaCredito.reversed.toList();
-
     notifyListeners();
-    var a = faturaCredito.reversed.toList();
+
+    updateMonths();
+
+    print("\nFATURA-DEBITO: " + faturaDebito.toString() + "\n");
     print("\nFATURA-CREDITO: " + faturaCredito.toString() + "\n");
-    // print("\nFATURA-CREDITO2: " + a.toString() + "\n");
+    updateWaiting(true);
+  }
+
+  List<List<String>> _fMonths = [];
+  List<List<String>> get fMonths => _fMonths;
+
+  void updateMonths() {
+    List<List<String>> monthsD = [];
+    List<List<String>> monthsC = [];
+    List<String> temp;
+    for (var card in userCards) {
+      temp = [];
+      for (var item in faturaDebito) {
+        if (!(temp.contains(
+                MainViewModel().getMonthYear(item['data'].substring(0, 7)))) &&
+            item['name_bank'] == card[4]) {
+          temp.add(MainViewModel().getMonthYear(item['data'].substring(0, 7)));
+        }
+      }
+      if (!(temp.contains(MainViewModel().currentMonth))) {
+        temp.add(MainViewModel().currentMonth);
+      }
+      monthsD.add(temp);
+    }
+
+    for (var card in userCards) {
+      temp = [];
+      for (var item in faturaCredito) {
+        if (!(temp.contains(
+                MainViewModel().getMonthYear(item['data'].substring(0, 7)))) &&
+            item['name_bank'] == card[4]) {
+          temp.add(MainViewModel().getMonthYear(item['data'].substring(0, 7)));
+        }
+      }
+      if (!(temp.contains(MainViewModel().currentMonth))) {
+        temp.add(MainViewModel().currentMonth);
+      }
+      monthsC.add(temp);
+    }
+
+    List<List<String>> months = [];
+    for (var i = 0; i < userCards.length; i++) {
+      List<String> aux = monthsD[i] + monthsC[i];
+      months.add([]);
+      for (var j = 0; j < aux.length; j++) {
+        if (!(months[i].contains(aux[j]))) {
+          months[i].add(aux[j]);
+        }
+      }
+    }
+
+    _fMonths = months;
+    notifyListeners();
   }
 
   Future<bool> ops_dep_pag(double valor, int index) async {
@@ -297,6 +318,14 @@ class FirestoreModel with ChangeNotifier {
     "assets/profileImage.jpg",
   ];
 
+  bool _waiting;
+  bool get waiting => _waiting;
+  void updateWaiting(bool aux) {
+    _waiting = aux;
+    // print("\n\n\nwaiting: " + aux.toString() + "\n\n\n");
+    notifyListeners();
+  }
+
   void updateUserInfo() async {
     FirebaseUser user = await FirebaseAuth.instance.currentUser();
     if (user != null) {
@@ -311,11 +340,12 @@ class FirestoreModel with ChangeNotifier {
                 .replaceAll("=s96-c", "")
             : "assets/profileImage.jpg"
       ];
+      updateCurrentOption(0);
       updateInfo(aux);
-      // resetCards();
       getUserContas();
     } else {
       print("Error: Updating User Info...");
+      updateWaiting(true);
     }
   }
 
@@ -362,6 +392,7 @@ class FirestoreModel with ChangeNotifier {
 
   FirestoreModel() {
     print("Iniciando FirestoreModel...");
+    updateWaiting(true);
     updateUserInfo();
   }
 }

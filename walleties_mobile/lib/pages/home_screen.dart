@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:walleties_mobile/colors/colors.dart';
 import 'package:walleties_mobile/models/main_view_model.dart';
 import 'package:walleties_mobile/pages/HS_widgets/card_aba.dart';
 import 'package:walleties_mobile/pages/HS_widgets/drawer.dart';
@@ -27,6 +28,16 @@ class HomeScreen extends StatelessWidget {
         ),
         actions: [
           IconButton(
+            icon: Icon(
+              Icons.autorenew,
+              color: yellow,
+            ),
+            onPressed: () {
+              model.updateWaiting(false);
+              model.updateUserInfo();
+            },
+          ),
+          IconButton(
             icon: Icon(Icons.add),
             onPressed: () {
               model.updateIsAddCardFormOpen(false);
@@ -39,11 +50,15 @@ class HomeScreen extends StatelessWidget {
                 ),
               );
             },
-          )
+          ),
         ],
       ),
       drawer: UserDrawer(),
-      body: model.currentOption[0] == 0 ? AbaGeral() : AbaCartao(),
+      body: model.waiting
+          ? model.currentOption[0] == 0 ? AbaGeral() : AbaCartao()
+          : Center(
+              child: CircularProgressIndicator(),
+            ),
       bottomNavigationBar: model.currentOption[0] != 0
           ? BottomAppBar(
               child: Container(
@@ -56,6 +71,7 @@ class HomeScreen extends StatelessWidget {
                     4,
                     (index) => FlatButton(
                       onPressed: () {
+                        model.updateCobMoney("0,00");
                         Navigator.push(
                           context,
                           MaterialPageRoute(

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_masked_text/flutter_masked_text.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:walleties/model/firestore_model.dart';
@@ -20,10 +21,10 @@ class _CardOperationsState extends State<CardOperations> {
 
   TextEditingController _nomeController;
   TextEditingController _cpfController;
-  TextEditingController _valorController;
+  MoneyMaskedTextController _valorController;
   TextEditingController _agenciaController;
   TextEditingController _contaController;
-  TextEditingController _boletoController;
+  MoneyMaskedTextController _boletoController;
   List controllers;
 
   @override
@@ -31,10 +32,12 @@ class _CardOperationsState extends State<CardOperations> {
     super.initState();
     _nomeController = TextEditingController(text: "");
     _cpfController = TextEditingController(text: "");
-    _valorController = TextEditingController(text: "");
+    _valorController = MoneyMaskedTextController(
+        decimalSeparator: ',', thousandSeparator: '.', initialValue: 0.0);
     _agenciaController = TextEditingController(text: "");
     _contaController = TextEditingController(text: "");
-    _boletoController = TextEditingController(text: "");
+    _boletoController = MoneyMaskedTextController(
+        decimalSeparator: ',', thousandSeparator: '.', initialValue: 0.0);
     controllers = [
       [_valorController],
       [_boletoController],
@@ -221,8 +224,8 @@ class OpPagamento extends StatelessWidget {
       children: [
         AddCardField(
           controller: controllers[0],
-          hint: "00000.00000 00000.000000 00000.000000 0 00000000000000",
-          label: "Código de Barras",
+          hint: "10,00",
+          label: "Valor",
         ),
       ],
     );
@@ -282,12 +285,12 @@ class OpTransferencia extends StatelessWidget {
               ),
         AddCardField(
           controller: controllers[2],
-          hint: "algo",
+          hint: "1234",
           label: "Agência",
         ),
         AddCardField(
           controller: controllers[3],
-          hint: "algo",
+          hint: "12345-6",
           label: "Conta",
         ),
       ],
@@ -317,11 +320,7 @@ class AddCardField extends StatelessWidget {
         child: TextFormField(
           controller: _controller,
           inputFormatters: <TextInputFormatter>[
-            _label == "Valor"
-                ? WhitelistingTextInputFormatter(RegExp("[0-9,]"))
-                : _label == "Código de Barras"
-                    ? WhitelistingTextInputFormatter(RegExp("[0-9. ]"))
-                    : BlacklistingTextInputFormatter(RegExp("[,.]")),
+            WhitelistingTextInputFormatter(RegExp("[0-9]"))
           ],
           decoration: InputDecoration(
             hintText: _hint,
