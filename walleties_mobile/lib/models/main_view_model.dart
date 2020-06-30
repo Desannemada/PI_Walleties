@@ -314,7 +314,7 @@ class MainViewModel with ChangeNotifier {
         }
       }
       getDebitoCredito();
-      createSliders();
+      // createSliders();
     } else {
       updateWaiting(true);
     }

@@ -138,32 +138,34 @@ class _AddCardState extends State<AddCard> {
                     ),
                     onPressed: () async {
                       bool aux = true;
+                      print(fmodel.userCards);
                       for (var card in fmodel.userCards) {
                         if (model.chosenBank == card[4]) {
                           aux = false;
                         }
                       }
-
-                      if (cvmodel.isValid && aux) {
-                        var res = await fmodel.addCard(
-                            _nomeController.text,
-                            _numeroCartaoController.text,
-                            _validadeController.text,
-                            _cvvController.text,
-                            model.chosenBank,
-                            _agenciaController.text,
-                            _contaController.text);
-                        if (res) {
-                          Navigator.of(context).pop();
-                        }
-                        showDialog(
-                            context: context,
-                            builder: (context) {
-                              Future.delayed(Duration(seconds: 1), () {
-                                Navigator.of(context).pop(true);
+                      if (aux) {
+                        if (cvmodel.isValid) {
+                          var res = await fmodel.addCard(
+                              _nomeController.text,
+                              _numeroCartaoController.text,
+                              _validadeController.text,
+                              _cvvController.text,
+                              model.chosenBank,
+                              _agenciaController.text,
+                              _contaController.text);
+                          if (res) {
+                            Navigator.of(context).pop();
+                          }
+                          showDialog(
+                              context: context,
+                              builder: (context) {
+                                Future.delayed(Duration(seconds: 1), () {
+                                  Navigator.of(context).pop(true);
+                                });
+                                return ResultAddDialog(res ? 0 : 1);
                               });
-                              return ResultAddDialog(res ? 0 : 1);
-                            });
+                        }
                       } else {
                         showDialog(
                             context: context,

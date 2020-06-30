@@ -87,6 +87,8 @@ class FirestoreModel with ChangeNotifier {
       [MyFlutterApp.cog_1, "Configurações"]
     ];
     _userCards = [];
+    faturaCredito = [];
+    faturaDebito = [];
   }
 
   void updateOptions(String option) {

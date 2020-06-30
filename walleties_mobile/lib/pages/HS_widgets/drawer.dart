@@ -247,15 +247,42 @@ class ConfigMenu extends StatelessWidget {
                   }
                   if (index == 0) {
                     model.updateisConfigDown(false);
-                    // showDialog(
-                    //   context: context,
-                    //   child: EditProfile(initialValue: fmodel.userInfo[0]),
-                    // );
+                    Navigator.of(context).pop();
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) {
+                          return EditProfile();
+                        },
+                      ),
+                    );
                   }
                 },
               ),
             );
           }),
+    );
+  }
+}
+
+class EditProfile extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          color: Colors.black,
+          onPressed: () => Navigator.of(context).pop(),
+        ),
+        title: Text(
+          "Perfil",
+          style: TextStyle(
+            color: Colors.black,
+          ),
+        ),
+      ),
     );
   }
 }
