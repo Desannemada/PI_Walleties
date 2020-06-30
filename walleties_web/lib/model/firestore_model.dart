@@ -334,7 +334,7 @@ class FirestoreModel with ChangeNotifier {
       print("Updating User Info...");
       List aux = [
         user.displayName == null ? "Username" : user.displayName,
-        user.email != null ? user.email : "usuario@gmail.com",
+        user.email != null ? user.email : "usuario@walleties.com",
         user.uid != null ? user.uid : "userId",
         user.photoUrl != null
             ? user.photoUrl

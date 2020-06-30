@@ -1,4 +1,8 @@
+import 'dart:io';
+
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:walleties_mobile/colors/colors.dart';
 import 'package:walleties_mobile/models/firebase_auth.dart';
@@ -248,11 +252,13 @@ class ConfigMenu extends StatelessWidget {
                   if (index == 0) {
                     model.updateisConfigDown(false);
                     Navigator.of(context).pop();
+                    model.updateEditProfileInfo(null, 1);
+                    model.updateEditProfileInfo(false, 0);
                     Navigator.push(
                       context,
                       MaterialPageRoute(
                         builder: (context) {
-                          return EditProfile();
+                          return EditProfile(initialValue: model.userInfo[0]);
                         },
                       ),
                     );
@@ -265,9 +271,63 @@ class ConfigMenu extends StatelessWidget {
   }
 }
 
-class EditProfile extends StatelessWidget {
+class EditProfile extends StatefulWidget {
+  final initialValue;
+
+  EditProfile({@required this.initialValue});
+  @override
+  _EditProfileState createState() => _EditProfileState();
+}
+
+class _EditProfileState extends State<EditProfile> {
+  TextEditingController _controller;
+  final _formKey = GlobalKey<FormState>();
+  StorageUploadTask _uploadTask;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = TextEditingController(text: widget.initialValue);
+  }
+
   @override
   Widget build(BuildContext context) {
+    final model = Provider.of<MainViewModel>(context);
+    final filePath = 'images/${model.userInfo[2]}.png';
+    final url = "gs://walleties-59f0f.appspot.com/walleties-59f0f.appspot.com";
+
+    Future<dynamic> getImage() async {
+      StorageReference ref =
+          await FirebaseStorage.instance.getReferenceFromUrl(url);
+      var storage = ref.child(filePath);
+      return storage.getDownloadURL();
+    }
+
+    getTempImage() async {
+      var aux = await getImage();
+      if (aux != null) {
+        model.updateEditProfileInfo(aux.toString(), 1);
+        model.updateEditProfileInfo(false, 0);
+      }
+    }
+
+    void uploadToFirebase(File file) async {
+      StorageReference ref =
+          await FirebaseStorage.instance.getReferenceFromUrl(url);
+      var aux = ref.child(filePath).putFile(file);
+      setState(() {
+        _uploadTask = aux;
+      });
+      model.updateEditProfileInfo(true, 0);
+      // print(getImage());
+    }
+
+    String _bytesTransferred(StorageTaskSnapshot snapshot) {
+      double res = snapshot.bytesTransferred / 1024.0;
+      double res2 = snapshot.totalByteCount / 1024.0;
+      return '${res.truncate().toString()}/${res2.truncate().toString()}';
+    }
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
@@ -277,12 +337,215 @@ class EditProfile extends StatelessWidget {
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: Text(
-          "Perfil",
+          "Editar Perfil",
           style: TextStyle(
             color: Colors.black,
           ),
         ),
       ),
+      body: Container(
+        padding: EdgeInsets.only(left: 20, right: 20, bottom: 20, top: 10),
+        child: ListView(
+          shrinkWrap: true,
+          children: [
+            SizedBox(height: 20),
+            Center(
+              child: Card(
+                elevation: 5,
+                shape: CircleBorder(),
+                child: !model.editProfileInfo[0]
+                    ? Container(
+                        height: 96,
+                        width: 96,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          image: DecorationImage(
+                            image: model.editProfileInfo[1] == null
+                                ? model.userInfo[3] == 'assets/profileImage.jpg'
+                                    ? AssetImage('assets/profileImage.jpg')
+                                    : NetworkImage(model.userInfo[3])
+                                : NetworkImage(model.editProfileInfo[1]),
+                          ),
+                        ),
+                      )
+                    : Container(
+                        height: 96,
+                        width: 96,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                        ),
+                        child: CircularProgressIndicator(),
+                      ),
+              ),
+            ),
+            SizedBox(height: 5),
+            _uploadTask != null
+                ? Center(
+                    child: StreamBuilder(
+                      stream: _uploadTask.events,
+                      builder: (context, snapshot) {
+                        Widget subtitle;
+                        if (snapshot.hasData) {
+                          final StorageTaskEvent event = snapshot.data;
+                          final StorageTaskSnapshot snap = event.snapshot;
+                          subtitle = Text('${_bytesTransferred(snap)} KB sent');
+                          if (_uploadTask.isSuccessful) {
+                            getTempImage();
+                          }
+                        } else {
+                          subtitle = const Text('Starting...');
+                        }
+                        return ListTile(
+                          title:
+                              _uploadTask.isComplete && _uploadTask.isSuccessful
+                                  ? Center(
+                                      child: Text(
+                                        'Completo',
+                                        // style: detailStyle,
+                                      ),
+                                    )
+                                  : Center(
+                                      child: Text(
+                                        'Uploading',
+                                        // style: detailStyle,
+                                      ),
+                                    ),
+                          subtitle: Center(child: subtitle),
+                        );
+                      },
+                    ),
+                  )
+                : Container(),
+            SizedBox(height: 5),
+            Align(
+              alignment: Alignment.center,
+              child: Container(
+                padding: EdgeInsets.only(top: 5),
+                height: 35,
+                child: RaisedButton(
+                  color: Colors.grey,
+                  child: Text(
+                    "Escolher Imagem",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  onPressed: () async {
+                    //get image
+                    var image = await ImagePicker()
+                        .getImage(source: ImageSource.gallery);
+                    if (image != null) {
+                      uploadToFirebase(File(image.path));
+                    } else {
+                      print("Imagem nao foi selecionada");
+                    }
+                  },
+                ),
+              ),
+            ),
+            SizedBox(height: 20),
+            Form(
+              key: _formKey,
+              child: TextFormField(
+                controller: _controller,
+                decoration: InputDecoration(
+                  labelText: "Nome",
+                  contentPadding:
+                      EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(5),
+                  ),
+                ),
+                validator: (val) {
+                  if (val == "") {
+                    return "Valor não pode ser vazio";
+                  }
+                },
+              ),
+            ),
+            SizedBox(height: 20),
+            RaisedButton(
+              color: Colors.blue,
+              child: Text(
+                "Salvar",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              onPressed: () async {
+                // print(model.editProfileInfo[1]);
+                // print(model.userInfo[3]);
+                // print(model.userInfo[3]);
+                // var image = await getImage();
+
+                if (_formKey.currentState.validate()) {
+                  int res = await model.updateUserDisplayName(_controller.text);
+                  int res2 =
+                      await model.updateUserPhotoURL(model.editProfileInfo[1]);
+
+                  if (res == 0 && res2 == 0) {
+                    showDialog(
+                      context: context,
+                      child: EditDialog(
+                        "Aviso",
+                        "Não houve mudanças.",
+                      ),
+                    );
+                  } else {
+                    if (res == 2 || res2 == 2) {
+                      showDialog(
+                        context: context,
+                        child: EditDialog(
+                          "Erro",
+                          "Algo deu errado. Tente novamente mais tarde.",
+                        ),
+                      );
+                    } else {
+                      showDialog(
+                        context: context,
+                        child: EditDialog(
+                          "Edição Concluída",
+                          "Perfil editado com sucesso. Mudanças em outras plataformas requerem relogar.",
+                        ),
+                      );
+                    }
+                  }
+                }
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class EditDialog extends StatelessWidget {
+  EditDialog(this.title, this.content);
+  final String title;
+  final String content;
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: Text(title),
+      content: Text(content),
+      actions: [
+        Center(
+          child: FlatButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text(
+              "OK",
+              style: TextStyle(
+                color: darkGreen,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        )
+      ],
     );
   }
 }

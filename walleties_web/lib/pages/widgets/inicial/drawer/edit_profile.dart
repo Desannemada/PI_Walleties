@@ -115,10 +115,15 @@ class _EditProfileState extends State<EditProfile> {
                     elevation: 3,
                     shape: CircleBorder(),
                     child: tempImage == null
-                        ? Image.asset(
-                            'assets/profileImage.jpg',
-                            scale: 2.3,
-                          )
+                        ? fmodel.userInfo[3] == 'assets/profileImage.jpg'
+                            ? Image.asset(
+                                'assets/profileImage.jpg',
+                                scale: 2.3,
+                              )
+                            : Image.network(
+                                fmodel.userInfo[3],
+                                fit: BoxFit.cover,
+                              )
                         : Image.network(
                             tempImage,
                             fit: BoxFit.cover,

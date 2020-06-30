@@ -71,15 +71,17 @@ class HomeScreen extends StatelessWidget {
                     4,
                     (index) => FlatButton(
                       onPressed: () {
-                        model.updateCobMoney("0,00");
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) {
-                              return Operacoes(index);
-                            },
-                          ),
-                        );
+                        if (index < 2) {
+                          model.updateCobMoney("0,00");
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) {
+                                return Operacoes(index);
+                              },
+                            ),
+                          );
+                        }
                       },
                       child: Text(
                         model.currentOption[3][index],

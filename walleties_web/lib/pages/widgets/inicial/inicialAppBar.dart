@@ -111,10 +111,10 @@ class AppBarItems extends StatelessWidget {
         } else if (index == 2) {
           print("Transferir");
           model.updateChosenBankT(fmodel.currentOption[1]);
-          showDialog(context: context, child: CardOperations(index: 2));
+          // showDialog(context: context, child: CardOperations(index: 2));
         } else if (index == 3) {
           print("Cobrar");
-          showDialog(context: context, child: CardOperations(index: 3));
+          // showDialog(context: context, child: CardOperations(index: 3));
         }
       }
     }

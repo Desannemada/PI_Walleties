@@ -135,7 +135,7 @@ class MainViewModel with ChangeNotifier {
         user.displayName == null
             ? "Username"
             : user.displayName == "" ? "Username" : user.displayName,
-        user.email != null ? user.email : "usuario@gmail.com",
+        user.email != null ? user.email : "usuario@walleties.com",
         user.uid != null ? user.uid : "userId",
         user.photoUrl != null
             ? user.photoUrl
@@ -597,26 +597,37 @@ class MainViewModel with ChangeNotifier {
         .format(result);
   }
 
-  void updateUserDisplayName(String name) async {
+  Future<int> updateUserDisplayName(String name) async {
     FirebaseUser user = await FirebaseAuth.instance.currentUser();
     UserUpdateInfo profile = UserUpdateInfo();
-    if (name != null && userInfo[0] != name) {
+    if (userInfo[0] == name) {
+      return 0;
+    }
+    if (name != null) {
       profile.displayName = name;
       userInfo[0] = name;
       user.updateProfile(profile);
       notifyListeners();
+      return 1;
     }
+    return 2;
   }
 
-  void updateUserPhotoURL(String url) async {
+  Future<int> updateUserPhotoURL(String url) async {
     FirebaseUser user = await FirebaseAuth.instance.currentUser();
     UserUpdateInfo profile = UserUpdateInfo();
+    if (editProfileInfo[1] == null) {
+      return 0;
+    }
     if (url != null) {
       // print("\nphotourl\n");
       profile.photoUrl = url;
       userInfo[3] = url;
       user.updateProfile(profile);
       notifyListeners();
+      return 1;
+    } else {
+      return 2;
     }
   }
 
@@ -768,6 +779,13 @@ class MainViewModel with ChangeNotifier {
   int get chosenConta => _chosenConta;
   void updateChosenConta(int aux) {
     _chosenConta = aux;
+    notifyListeners();
+  }
+
+  List _editProfileInfo = [false, null];
+  List get editProfileInfo => _editProfileInfo;
+  void updateEditProfileInfo(var aux, int i) {
+    _editProfileInfo[i] = aux;
     notifyListeners();
   }
 }
