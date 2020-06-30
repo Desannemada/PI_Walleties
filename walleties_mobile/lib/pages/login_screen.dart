@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:walleties_mobile/colors/colors.dart';
 import 'package:walleties_mobile/models/main_view_model.dart';
 import 'package:walleties_mobile/pages/LS_widgets/login.dart';
@@ -48,11 +49,14 @@ class LoginScreen extends StatelessWidget {
 class LoginScreenMenu extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
+    final model = Provider.of<MainViewModel>(context);
+    return ListView(
+      shrinkWrap: true,
+      // crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Logo(),
-        Spacer(),
+        Logo(8),
+        // Spacer(),
+        SizedBox(height: 20),
         Text(
           "Nosso aplicativo integra e gerencia todas as suas contas bancárias em um lugar só.",
           textAlign: TextAlign.center,
@@ -60,6 +64,7 @@ class LoginScreenMenu extends StatelessWidget {
         ),
         Text(
           "Deposite, pague, transfira, agilize!",
+          textAlign: TextAlign.center,
           style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.bold,
@@ -67,6 +72,7 @@ class LoginScreenMenu extends StatelessWidget {
         ),
         Container(
           padding: EdgeInsets.only(top: 20),
+          alignment: Alignment.center,
           height: 65,
           child: ListView.separated(
             shrinkWrap: true,
@@ -76,7 +82,8 @@ class LoginScreenMenu extends StatelessWidget {
             itemBuilder: (context, index) => Image.asset(images[index]),
           ),
         ),
-        Spacer(),
+        // Spacer(),
+        SizedBox(height: 20),
         Column(
           children: [
             LoginScreenButton(0),
@@ -84,7 +91,36 @@ class LoginScreenMenu extends StatelessWidget {
             LoginScreenButton(1),
           ],
         ),
-        Spacer(),
+        // Spacer(),
+        SizedBox(height: 20),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: List.generate(
+            2,
+            (index) => Expanded(
+              child: FlatButton(
+                onPressed: () async {
+                  if (index == 1) {
+                    String url = "https://github.com/Desannemada/PI_Walleties";
+                    if (await canLaunch(url)) {
+                      launch(url);
+                    } else {
+                      print("Erro github");
+                    }
+                  } else {
+                    model.changeAtualLoginWidget(DeveloperScreen());
+                  }
+                },
+                child: Text(
+                  index == 0 ? "DESENVOLVEDORES" : "GITHUB",
+                  style: TextStyle(
+                    fontSize: 16,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
       ],
     );
   }
@@ -116,6 +152,128 @@ class LoginScreenButton extends StatelessWidget {
         onPressed: () => index == 0
             ? model.changeAtualLoginWidget(Login())
             : model.changeAtualLoginWidget(SignIn()),
+      ),
+    );
+  }
+}
+
+class DeveloperScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final model = Provider.of<MainViewModel>(context);
+
+    final List<List<String>> developers = [
+      ["assets/renato.png", "Desenvolvedor Back-End"],
+      ["assets/bruno.png", "Cyber Security"],
+      ["assets/neto.png", "Gerente de Projeto"],
+      ["assets/anne.png", "	Desenvolvedora Front-End"],
+    ];
+
+    return Container(
+      width: double.infinity,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        // shrinkWrap: true,
+        children: [
+          Container(
+            height: 64,
+            child: Stack(
+              children: [
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: IconButton(
+                    icon: Icon(
+                      Icons.arrow_back,
+                      size: 35,
+                    ),
+                    onPressed: () =>
+                        model.changeAtualLoginWidget(LoginScreenMenu()),
+                  ),
+                ),
+                Logo(10),
+              ],
+            ),
+          ),
+          Expanded(
+            child: ListView(
+              // physics: NeverScrollableScrollPhysics(),
+              shrinkWrap: true,
+              children: [
+                // SizedBox(height: 10),
+                Center(
+                  child: Text(
+                    "Conheça os nossos desenvolvedores:",
+                    style: TextStyle(
+                      fontSize: 18,
+                      color: Colors.black,
+                      fontFamily: "Open Sans",
+                    ),
+                  ),
+                ),
+                SizedBox(height: 20),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Developer(developer: developers[0]),
+                    Developer(developer: developers[1]),
+                  ],
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Developer(developer: developers[2]),
+                    Developer(developer: developers[3]),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class Developer extends StatelessWidget {
+  Developer({
+    @required this.developer,
+  });
+
+  final List<String> developer;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: MediaQuery.of(context).size.width * 0.38,
+      height: MediaQuery.of(context).size.width * 0.38,
+      child: Column(
+        children: [
+          Container(
+            width: 100,
+            height: 100,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(
+                color: Colors.lightBlue,
+                width: 2,
+              ),
+              image: DecorationImage(
+                image: AssetImage(developer[0]),
+                scale: 5,
+                fit: BoxFit.fill,
+              ),
+            ),
+          ),
+          SizedBox(height: 5),
+          Text(
+            developer[1],
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontWeight: FontWeight.w600,
+              fontSize: 14,
+            ),
+          ),
+        ],
       ),
     );
   }

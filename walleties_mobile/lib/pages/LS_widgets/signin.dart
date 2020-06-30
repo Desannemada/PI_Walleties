@@ -75,7 +75,7 @@ class _SignInState extends State<SignIn> {
                             model.changeAtualLoginWidget(LoginScreenMenu()),
                       ),
                     ),
-                    Logo(),
+                    Logo(10),
                   ],
                 ),
               ),

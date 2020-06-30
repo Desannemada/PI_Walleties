@@ -55,6 +55,7 @@ class _LoginState extends State<Login> {
               Container(
                 height: 64,
                 child: Stack(
+                  alignment: Alignment.center,
                   children: [
                     Align(
                       alignment: Alignment.centerLeft,
@@ -67,7 +68,7 @@ class _LoginState extends State<Login> {
                             model.changeAtualLoginWidget(LoginScreenMenu()),
                       ),
                     ),
-                    Logo(),
+                    Logo(10),
                   ],
                 ),
               ),
@@ -206,6 +207,7 @@ class _LoginState extends State<Login> {
                               } else {
                                 setState(() {
                                   error = res;
+                                  waiting = false;
                                 });
                               }
                             } else {

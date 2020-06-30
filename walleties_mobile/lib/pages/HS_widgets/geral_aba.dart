@@ -2,14 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:walleties_mobile/colors/colors.dart';
-// import 'package:walleties_mobile/models/account_model.dart';
 import 'package:walleties_mobile/models/main_view_model.dart';
 import 'package:walleties_mobile/pages/HS_widgets/digi_ops.dart';
 
 class AbaGeral extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    // final amodel = Provider.of<AccountModel>(context);
     final model = Provider.of<MainViewModel>(context);
 
     return Container(
@@ -308,25 +306,29 @@ class GeralCard extends StatelessWidget {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text(
-                                        model.getOptions(i + 1)[1],
-                                        style: TextStyle(
-                                          color: model.getOptions(i + 1)[2],
-                                          fontSize: 16,
+                                  Container(
+                                    width: double.infinity,
+                                    child: Wrap(
+                                      alignment: WrapAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          model.getOptions(i + 1)[1],
+                                          style: TextStyle(
+                                            color: model.getOptions(i + 1)[2],
+                                            fontSize: 16,
+                                          ),
                                         ),
-                                      ),
-                                      Text(
-                                        model.getSingular(i, index),
-                                        style: TextStyle(
-                                          color: model.getOptions(i + 1)[2],
-                                          fontSize: 16,
+                                        Container(
+                                          child: Text(
+                                            model.getSingular(i, index),
+                                            style: TextStyle(
+                                              color: model.getOptions(i + 1)[2],
+                                              fontSize: 16,
+                                            ),
+                                          ),
                                         ),
-                                      ),
-                                    ],
+                                      ],
+                                    ),
                                   ),
                                   SizedBox(height: 3),
                                   Container(

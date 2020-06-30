@@ -132,7 +132,9 @@ class MainViewModel with ChangeNotifier {
     if (user != null) {
       print("\nUpdating User Info...\n");
       List aux = [
-        user.displayName == null ? "Username" : user.displayName,
+        user.displayName == null
+            ? "Username"
+            : user.displayName == "" ? "Username" : user.displayName,
         user.email != null ? user.email : "usuario@gmail.com",
         user.uid != null ? user.uid : "userId",
         user.photoUrl != null
@@ -141,6 +143,7 @@ class MainViewModel with ChangeNotifier {
                 .replaceAll("=s96-c", "")
             : "assets/profileImage.jpg"
       ];
+      print(aux);
       updateCurrentOption(0);
       updateInfo(aux);
       getUserContas();
@@ -757,5 +760,12 @@ class MainViewModel with ChangeNotifier {
     }
     // print(aux);
     return aux;
+  }
+
+  int _chosenConta = 0;
+  int get chosenConta => _chosenConta;
+  void updateChosenConta(int aux) {
+    _chosenConta = aux;
+    notifyListeners();
   }
 }

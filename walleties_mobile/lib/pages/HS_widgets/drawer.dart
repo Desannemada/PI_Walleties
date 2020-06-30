@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:walleties_mobile/colors/colors.dart';
-// import 'package:walleties_mobile/models/account_model.dart';
 import 'package:walleties_mobile/models/firebase_auth.dart';
 import 'package:walleties_mobile/models/main_view_model.dart';
 import 'package:walleties_mobile/pages/login_screen.dart';
@@ -10,7 +9,7 @@ class UserDrawer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final model = Provider.of<MainViewModel>(context);
-    // final amodel = Provider.of<AccountModel>(context);
+
     return Drawer(
       child: Container(
         decoration: BoxDecoration(
@@ -88,7 +87,9 @@ class UserDrawer extends StatelessWidget {
                         model.userInfo[0],
                         textAlign: TextAlign.center,
                         style: TextStyle(
-                            fontWeight: FontWeight.w400, fontSize: 20),
+                          fontWeight: FontWeight.w400,
+                          fontSize: 20,
+                        ),
                       ),
                       Text(
                         model.userInfo[1],
@@ -114,8 +115,13 @@ class UserDrawer extends StatelessWidget {
                         return Column(
                           children: <Widget>[
                             Container(
-                              margin:
-                                  EdgeInsets.only(left: 10, right: 10, top: 10),
+                              margin: EdgeInsets.only(
+                                  left: 10,
+                                  right: 10,
+                                  top: 10,
+                                  bottom: index == model.options.length - 1
+                                      ? 10
+                                      : 1),
                               height: 45,
                               child: RaisedButton(
                                 padding: EdgeInsets.zero,

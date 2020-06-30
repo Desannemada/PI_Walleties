@@ -243,7 +243,7 @@ class AddCardField extends StatelessWidget {
   Widget build(BuildContext context) {
     double pad;
     if (["CVV", "Validade", "Conta", "Agência"].contains(_label)) {
-      pad = 180;
+      pad = MediaQuery.of(context).size.width * 0.44;
     } else {
       pad = double.infinity;
     }

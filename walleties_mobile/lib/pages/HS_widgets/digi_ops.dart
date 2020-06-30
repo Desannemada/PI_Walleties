@@ -144,6 +144,7 @@ class _DigiOpPagarState extends State<DigiOpPagar> {
   Future<String> scan() async {
     try {
       var result = await BarcodeScanner.scan();
+      print(result.rawContent);
       return result.rawContent;
     } on PlatformException catch (e) {
       if (e.code == BarcodeScanner.cameraAccessDenied) {
@@ -235,160 +236,166 @@ class _DigiOpPagarState extends State<DigiOpPagar> {
                       child: Column(
                         children: [
                           Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Row(
+                              Column(
+                                // mainAxisAlignment: MainAxisAlignment.start,
                                 children: [
-                                  Column(
-                                    children: [
-                                      Container(
-                                        margin: EdgeInsets.only(bottom: 10),
-                                        width: 8,
-                                        height: 8,
-                                        decoration: BoxDecoration(
+                                  Container(
+                                    padding: EdgeInsets.all(3),
+                                    decoration: BoxDecoration(
+                                      border: Border.all(
+                                          width: 2,
                                           color: model.avaliacoes[index]
                                                       ['status'] ==
                                                   "positivo"
                                               ? Colors.green
-                                              : Colors.red,
-                                          shape: BoxShape.circle,
-                                        ),
+                                              : Colors.red),
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: Container(
+                                      width: 38,
+                                      height: 38,
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        color: model.getOptions(index + 1)[2],
                                       ),
-                                      Container(
-                                        width: 50,
-                                        height: 50,
-                                        decoration: BoxDecoration(
-                                          shape: BoxShape.circle,
-                                          color: model.getOptions(index + 1)[2],
-                                        ),
-                                        child: Center(
-                                          child: Text(
-                                            model.getOptions(index + 1)[1][0],
-                                            style: TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 22,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  SizedBox(width: 15),
-                                  Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        model.userCards[index][0],
-                                        style: TextStyle(
-                                          fontSize: 15,
-                                        ),
-                                      ),
-                                      SizedBox(height: 3),
-                                      Text(
-                                        "****-****-****-" +
-                                            model.userCards[index][1]
-                                                .substring(15),
-                                        style: TextStyle(
-                                          color: model.getOptions(index + 1)[2],
-                                          fontWeight: FontWeight.w600,
-                                          fontSize: 15,
-                                        ),
-                                      ),
-                                      Container(
-                                        width: 200,
-                                        padding: EdgeInsets.all(5),
-                                        decoration: BoxDecoration(
-                                          border: Border.all(
-                                            color:
-                                                model.getOptions(index + 1)[2],
-                                          ),
-                                        ),
-                                        child: Form(
-                                          child: TextFormField(
-                                            controller:
-                                                model.pagControllers[index],
-                                            inputFormatters: [
-                                              WhitelistingTextInputFormatter(
-                                                RegExp("[0-9,.]"),
-                                              )
-                                            ],
-                                            decoration: InputDecoration(
-                                              contentPadding: EdgeInsets.zero,
-                                              labelText: "Valor",
-                                              hintText: "10,00",
-                                              counter: Text(
-                                                model.pagValues[index].isEmpty
-                                                    ? "R\$ 0,00"
-                                                    : "R\$ " +
-                                                        model.pagValues[index],
-                                                style: TextStyle(
-                                                  fontSize: 16,
-                                                  fontWeight: FontWeight.w600,
-                                                ),
-                                              ),
-                                            ),
-                                            onChanged: (value) {
-                                              try {
-                                                model.updatePagValues(
-                                                    oCcy.format(double.parse(
-                                                        model
-                                                            .pagControllers[
-                                                                index]
-                                                            .text
-                                                            .replaceAll(".", "")
-                                                            .replaceAll(
-                                                                ",", "."))),
-                                                    index);
-                                              } catch (e) {
-                                                print(
-                                                    "Error UpdatePagValues: " +
-                                                        e.message +
-                                                        "\n");
-                                                if (model.pagControllers[index]
-                                                    .text.isEmpty) {
-                                                  model.updatePagValues(
-                                                      "0,00", index);
-                                                } else {
-                                                  model.updatePagValues(
-                                                      "inválido", index);
-                                                }
-                                              }
-                                              // print(model.pagValues);
-                                            },
-                                          ),
-                                        ),
-                                      )
-                                    ],
-                                  ),
-                                ],
-                              ),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.end,
-                                  children: List.generate(
-                                    3,
-                                    (i) => Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.end,
-                                      children: [
-                                        Text(ops2[i]),
-                                        Text(
-                                          model.getSingular(index, i),
+                                      child: Center(
+                                        child: Text(
+                                          model.getOptions(index + 1)[1][0],
                                           style: TextStyle(
-                                            color:
-                                                model.getOptions(index + 1)[2],
-                                            fontWeight: FontWeight.w600,
+                                            color: Colors.white,
+                                            fontSize: 22,
                                           ),
                                         ),
-                                        SizedBox(height: 5)
-                                      ],
+                                      ),
                                     ),
                                   ),
+                                  // Container(
+                                  //   margin: EdgeInsets.only(top: 10),
+                                  //   width: 8,
+                                  //   height: 8,
+                                  //   decoration: BoxDecoration(
+                                  //     color: model.avaliacoes[index]
+                                  //                 ['status'] ==
+                                  //             "positivo"
+                                  //         ? Colors.green
+                                  //         : Colors.red,
+                                  //     shape: BoxShape.circle,
+                                  //   ),
+                                  // ),
+                                ],
+                              ),
+                              SizedBox(width: 15),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      model.userCards[index][0],
+                                      style: TextStyle(
+                                        fontSize: 15,
+                                      ),
+                                    ),
+                                    SizedBox(height: 3),
+                                    Text(
+                                      "****-****-****-" +
+                                          model.userCards[index][1]
+                                              .substring(15),
+                                      style: TextStyle(
+                                        color: model.getOptions(index + 1)[2],
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 15,
+                                      ),
+                                    ),
+                                    Container(
+                                      // width: 200,
+                                      padding: EdgeInsets.all(5),
+                                      decoration: BoxDecoration(
+                                        border: Border.all(
+                                          color: model.getOptions(index + 1)[2],
+                                        ),
+                                      ),
+                                      child: Form(
+                                        child: TextFormField(
+                                          controller:
+                                              model.pagControllers[index],
+                                          inputFormatters: [
+                                            WhitelistingTextInputFormatter(
+                                              RegExp("[0-9,.]"),
+                                            )
+                                          ],
+                                          decoration: InputDecoration(
+                                            contentPadding: EdgeInsets.zero,
+                                            labelText: "Valor",
+                                            hintText: "10,00",
+                                            counter: Text(
+                                              model.pagValues[index].isEmpty
+                                                  ? "R\$ 0,00"
+                                                  : "R\$ " +
+                                                      model.pagValues[index],
+                                              style: TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.w600,
+                                              ),
+                                            ),
+                                          ),
+                                          onChanged: (value) {
+                                            try {
+                                              model.updatePagValues(
+                                                  oCcy.format(double.parse(model
+                                                      .pagControllers[index]
+                                                      .text
+                                                      .replaceAll(".", "")
+                                                      .replaceAll(",", "."))),
+                                                  index);
+                                            } catch (e) {
+                                              print("Error UpdatePagValues: " +
+                                                  e.message +
+                                                  "\n");
+                                              if (model.pagControllers[index]
+                                                  .text.isEmpty) {
+                                                model.updatePagValues(
+                                                    "0,00", index);
+                                              } else {
+                                                model.updatePagValues(
+                                                    "inválido", index);
+                                              }
+                                            }
+                                            // print(model.pagValues);
+                                          },
+                                        ),
+                                      ),
+                                    )
+                                  ],
                                 ),
                               ),
                             ],
+                          ),
+                          SizedBox(height: 5),
+                          Container(
+                            width: double.infinity,
+                            child: Wrap(
+                              alignment: WrapAlignment.spaceEvenly,
+                              // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: List.generate(
+                                3,
+                                (i) => Column(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Text(ops2[i]),
+                                    Text(
+                                      model.getSingular(index, i),
+                                      style: TextStyle(
+                                        color: model.getOptions(index + 1)[2],
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                    SizedBox(height: 5)
+                                  ],
+                                ),
+                              ),
+                            ),
                           ),
                         ],
                       ),
@@ -618,8 +625,9 @@ class _DigiOpPagarState extends State<DigiOpPagar> {
                     color: Colors.blue,
                     onPressed: () async {
                       String res = await scan();
-                      // print("\n\n" + res + "\n\n");
+
                       List aux = res.split("+");
+                      print(aux);
                       for (var i = 0; i < model.userCards.length; i++) {
                         model.pagControllers[i].clear();
                         model.updatePagValues("0,00", i);
@@ -711,76 +719,72 @@ class _DigiOpCobrarState extends State<DigiOpCobrar> {
           SizedBox(height: 5),
           ListView.separated(
             shrinkWrap: true,
+            physics: NeverScrollableScrollPhysics(),
             itemCount: model.userCards.length,
             separatorBuilder: (context, index) => Divider(height: 5),
-            itemBuilder: (context, index) => Container(
-              width: double.infinity,
-              child: Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(8),
-                  child: Container(
-                    width: double.infinity,
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Row(
-                          children: [
-                            Icon(
-                              MyFlutterApp.pay,
-                              color: model.getOptions(index + 1)[2],
-                              size: 40,
-                            ),
-                            SizedBox(width: 15),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(model.userCards[index][0]),
-                                Row(
-                                  children: [
-                                    Row(
-                                      children: [
-                                        Text(
-                                          "Agência ",
-                                          style: TextStyle(
-                                            color:
-                                                model.getOptions(index + 1)[2],
-                                            fontWeight: FontWeight.w600,
-                                          ),
+            itemBuilder: (context, index) => GestureDetector(
+              onTap: () {
+                model.updateChosenConta(index);
+                model.updateShowQRCode(false);
+                model.updateInfoQRCode("");
+                model.updateChooseCobCard(index);
+                model.updateChecks();
+              },
+              child: Container(
+                width: double.infinity,
+                child: Card(
+                  color: model.chosenConta == index
+                      ? Colors.grey[300]
+                      : Colors.white,
+                  child: Padding(
+                    padding: const EdgeInsets.all(8),
+                    child: Container(
+                      width: double.infinity,
+                      child: Row(
+                        children: [
+                          Icon(
+                            MyFlutterApp.pay,
+                            color: model.getOptions(index + 1)[2],
+                            size: 40,
+                          ),
+                          SizedBox(width: 15),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(model.userCards[index][0]),
+                              Row(
+                                children: [
+                                  Row(
+                                    children: [
+                                      Text(
+                                        "Agência ",
+                                        style: TextStyle(
+                                          color: model.getOptions(index + 1)[2],
+                                          fontWeight: FontWeight.w600,
                                         ),
-                                        Text(model.userCards[index][5]),
-                                      ],
-                                    ),
-                                    SizedBox(width: 15),
-                                    Row(
-                                      children: [
-                                        Text(
-                                          "Conta ",
-                                          style: TextStyle(
-                                            color:
-                                                model.getOptions(index + 1)[2],
-                                            fontWeight: FontWeight.w600,
-                                          ),
+                                      ),
+                                      Text(model.userCards[index][5]),
+                                    ],
+                                  ),
+                                  SizedBox(width: 15),
+                                  Row(
+                                    children: [
+                                      Text(
+                                        "Conta ",
+                                        style: TextStyle(
+                                          color: model.getOptions(index + 1)[2],
+                                          fontWeight: FontWeight.w600,
                                         ),
-                                        Text(model.userCards[index][6]),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                        IconButton(
-                          icon: model.checks[index],
-                          onPressed: () {
-                            model.updateShowQRCode(false);
-                            model.updateInfoQRCode("");
-                            model.updateChooseCobCard(index);
-                            model.updateChecks();
-                          },
-                        ),
-                      ],
+                                      ),
+                                      Text(model.userCards[index][6]),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
