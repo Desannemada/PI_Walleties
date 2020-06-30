@@ -21,7 +21,7 @@ Prevendo este comportamento, a carteira virtual Walleties visa oferecer maior co
 #### Uma pequena amostra interativa de como poderá vir a ser o produto final:
 > Web: https://xd.adobe.com/view/97c289b8-a7d4-498f-72f5-2d8e2e837220-e1f3/
 
-> Mobile: https://xd.adobe.com/view/cb9d266d-238d-413c-6d46-fd471b89e1ef-bdac/ (Não Atualizado)
+> Mobile: https://xd.adobe.com/view/eb72e60c-1784-4fbc-a72a-f7479475a42c-be21/
 
 ## Instalação:
 #### Atualmente o Walleties está em status de desenvolvimento, para rodar o aplicativo será necessário: 
