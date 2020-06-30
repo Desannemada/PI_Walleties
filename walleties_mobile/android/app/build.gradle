@@ -38,7 +38,8 @@ android {
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId "com.example.walleties_mobile"
+        // applicationId "com.example.walleties_mobile"
+        applicationId "com.walleties_mobile"
         multiDexEnabled true
         minSdkVersion 19
         targetSdkVersion 28
