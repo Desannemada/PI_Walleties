@@ -12,6 +12,12 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final model = Provider.of<MainViewModel>(context);
+
+    if (model.userInfo[3] == 'assets/profileImage.jpg') {
+      precacheImage(AssetImage('assets/profileImage.jpg'), context);
+    } else {
+      precacheImage(NetworkImage(model.userInfo[3]), context);
+    }
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
