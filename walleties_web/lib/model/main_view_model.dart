@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:walleties/model/firestore_model.dart';
+import 'dart:html' as html;
 
 class MainViewModel with ChangeNotifier {
   //user info-------------------------------------------
@@ -140,6 +140,26 @@ class MainViewModel with ChangeNotifier {
   void updateCurrentMobileHomeWidget(bool aux) {
     _currentMobileHomeWidget = aux;
     notifyListeners();
+  }
+
+  var _iOS = [
+    'iPad Simulator',
+    'iPhone Simulator',
+    'iPod Simulator',
+    'iPad',
+    'iPhone',
+    'iPod'
+  ];
+
+  bool isIOS() {
+    var matches = false;
+    _iOS.forEach((name) {
+      if (html.window.navigator.platform.contains(name) ||
+          html.window.navigator.userAgent.contains(name)) {
+        matches = true;
+      }
+    });
+    return matches;
   }
 
   MainViewModel() {

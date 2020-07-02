@@ -23,8 +23,12 @@ Prevendo este comportamento, a carteira virtual Walleties visa oferecer maior co
 
 > Mobile: https://xd.adobe.com/view/eb72e60c-1784-4fbc-a72a-f7479475a42c-be21/
 
+## Teste nosso App:
+#### Atualmente o Walleties está em status de desenvolvimento mas é possível simular uma conta e testar suas funcionalidades acessando ao link abaixo. Somente disponível para Web e Android.
+> Walleties: https://desannemada.github.io/walleties
+
 ## Instalação:
-#### Atualmente o Walleties está em status de desenvolvimento, para rodar o aplicativo será necessário: 
+#### Para rodar o aplicativo será necessário: 
 1. Instalar nosso framework: https://flutter.dev/
 2. Clonar o projeto para seu editor de escolha:
 ```sh

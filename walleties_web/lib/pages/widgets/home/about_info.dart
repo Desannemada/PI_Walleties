@@ -1,19 +1,23 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:walleties/colors/colors.dart';
 import 'package:walleties/model/main_view_model.dart';
+import 'dart:html' as html;
 
 class AboutInfo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final model = Provider.of<MainViewModel>(context);
     return Column(
-      mainAxisSize: MainAxisSize.max,
+      mainAxisSize: MainAxisSize.min,
       children: [
         Container(
           width: double.infinity,
-          height: kIsWeb ? 90 : 50,
+          height: !(html.window.navigator.platform == "Android" ||
+                      html.window.navigator.userAgent.contains("Android")) &&
+                  !model.isIOS()
+              ? 90
+              : 50,
           child: Row(
             children: [
               FlatButton.icon(
@@ -40,11 +44,19 @@ class AboutInfo extends StatelessWidget {
         ),
         Expanded(
           child: Container(
-            margin: kIsWeb
+            margin: !(html.window.navigator.platform == "Android" ||
+                        html.window.navigator.userAgent.contains("Android")) &&
+                    !model.isIOS()
                 ? EdgeInsets.only(bottom: 90)
                 : EdgeInsets.only(bottom: 1),
             alignment: Alignment.center,
             child: ListView(
+              physics: (html.window.navigator.platform == "Android" ||
+                          html.window.navigator.userAgent
+                              .contains("Android")) ||
+                      !model.isIOS()
+                  ? NeverScrollableScrollPhysics()
+                  : AlwaysScrollableScrollPhysics(),
               shrinkWrap: true,
               children: [Desenvolvedores()],
             ),
@@ -90,7 +102,11 @@ class Desenvolvedores extends StatelessWidget {
               ],
             ),
           ),
-          kIsWeb ? SizedBox(height: 60) : SizedBox(height: 30),
+          !(html.window.navigator.platform == "Android" ||
+                      html.window.navigator.userAgent.contains("Android")) &&
+                  !model.isIOS()
+              ? SizedBox(height: 60)
+              : SizedBox(height: 30),
           Wrap(
             spacing: 30,
             runSpacing: 30,
