@@ -144,7 +144,10 @@ class ConfigMenu extends StatelessWidget {
                         content: Text("Têm certeza que deseja sair?"),
                         actions: [
                           FlatButton(
-                            onPressed: () => _signOut(),
+                            onPressed: () {
+                              Navigator.of(context, rootNavigator: true).pop();
+                              _signOut();
+                            },
                             child: Text(
                               "Sim",
                               style: TextStyle(

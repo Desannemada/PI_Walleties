@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:walleties/colors/colors.dart';
@@ -12,11 +13,14 @@ class AboutInfo extends StatelessWidget {
       children: [
         Container(
           width: double.infinity,
-          height: 90,
+          height: kIsWeb ? 90 : 50,
           child: Row(
             children: [
               FlatButton.icon(
-                onPressed: () => model.updateCurrentHomeWidget(0),
+                onPressed: () {
+                  model.updateCurrentHomeWidget(0);
+                  model.updateCurrentMobileHomeWidget(true);
+                },
                 icon: Icon(
                   Icons.arrow_back,
                   color: darkGreen,
@@ -36,7 +40,9 @@ class AboutInfo extends StatelessWidget {
         ),
         Expanded(
           child: Container(
-            margin: EdgeInsets.only(bottom: 90),
+            margin: kIsWeb
+                ? EdgeInsets.only(bottom: 90)
+                : EdgeInsets.only(bottom: 1),
             alignment: Alignment.center,
             child: ListView(
               shrinkWrap: true,
@@ -54,11 +60,12 @@ class Desenvolvedores extends StatelessWidget {
     ["assets/renato.png", "Desenvolvedor Back-End"],
     ["assets/bruno.png", "Cyber Security"],
     ["assets/neto.png", "Gerente de Projeto"],
-    ["assets/anne.png", "	Desenvolvedora Front-End"],
+    ["assets/anne.png", "Desenvolvedora Front-End"],
   ];
 
   @override
   Widget build(BuildContext context) {
+    final model = Provider.of<MainViewModel>(context);
     return Center(
       child: Column(
         children: [
@@ -83,7 +90,7 @@ class Desenvolvedores extends StatelessWidget {
               ],
             ),
           ),
-          SizedBox(height: 60),
+          kIsWeb ? SizedBox(height: 60) : SizedBox(height: 30),
           Wrap(
             spacing: 30,
             runSpacing: 30,
@@ -108,11 +115,15 @@ class Desenvolvedores extends StatelessWidget {
                     ),
                   ),
                   SizedBox(height: 10),
-                  Text(
-                    developers[index][1],
-                    style: TextStyle(
-                      fontWeight: FontWeight.w600,
-                      fontSize: 16,
+                  SizedBox(
+                    width: 200,
+                    child: Text(
+                      developers[index][1],
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 16,
+                      ),
                     ),
                   ),
                 ],

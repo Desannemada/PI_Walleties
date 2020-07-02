@@ -135,6 +135,13 @@ class MainViewModel with ChangeNotifier {
     notifyListeners();
   }
 
+  bool _currentMobileHomeWidget = true;
+  bool get currentMobileHomeWidget => _currentMobileHomeWidget;
+  void updateCurrentMobileHomeWidget(bool aux) {
+    _currentMobileHomeWidget = aux;
+    notifyListeners();
+  }
+
   MainViewModel() {
     _currentMonth =
         getMonth(DateTime.now().month) + " " + DateTime.now().year.toString();

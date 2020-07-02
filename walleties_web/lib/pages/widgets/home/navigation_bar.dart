@@ -22,14 +22,16 @@ class NavigationBar extends StatelessWidget {
             width: type ? 80 : 60,
             child: Image.asset('assets/logo.png'),
           ),
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              type ? Container() : SizedBox(width: 20),
-              NavBarItem('Github'),
-              SizedBox(width: type ? 60 : 40),
-              NavBarItem('Desenvolvedores'),
-            ],
+          Expanded(
+            child: Wrap(
+              alignment: WrapAlignment.end,
+              children: <Widget>[
+                type ? Container() : SizedBox(width: 20),
+                NavBarItem('Github'),
+                SizedBox(width: type ? 60 : 40),
+                NavBarItem('Desenvolvedores'),
+              ],
+            ),
           )
         ],
       ),
@@ -62,6 +64,7 @@ class NavBarItem extends StatelessWidget {
             }
           } else if (title == "Desenvolvedores") {
             model.updateCurrentHomeWidget(1);
+            model.updateCurrentMobileHomeWidget(false);
           }
         },
       ),

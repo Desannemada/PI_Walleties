@@ -22,7 +22,7 @@ class CustomAPI extends API {
 
   Future<List<dynamic>> getFaturaDebito(String email) async {
     var response = await http
-        .get("http://bankapi123.herokuapp.com/card-info/mostra/$email");
+        .get("https://bankapi123.herokuapp.com/card-info/mostra/$email");
     if (response.statusCode == 200) {
       return json.decode(response.body);
     } else {
@@ -32,7 +32,7 @@ class CustomAPI extends API {
 
   Future<List<dynamic>> getFaturaCredito(String email) async {
     var response = await http
-        .get("http://bankapi123.herokuapp.com/card-info/mostraCre/$email");
+        .get("https://bankapi123.herokuapp.com/card-info/mostraCre/$email");
     if (response.statusCode == 200) {
       return json.decode(response.body);
     } else {
@@ -42,7 +42,7 @@ class CustomAPI extends API {
 
   Future<List<dynamic>> getCardsInfo(String email) async {
     var response = await http
-        .get("http://bankapi123.herokuapp.com/card-info/card_list/$email");
+        .get("https://bankapi123.herokuapp.com/card-info/card_list/$email");
     if (response.statusCode == 200) {
       return json.decode(response.body);
     } else {
@@ -83,7 +83,7 @@ class CustomAPI extends API {
   }
 
   Future<http.Response> addNewCard(List<String> info) async {
-    var url = "http://bankapi123.herokuapp.com/card-info/add_card/${info[0]}";
+    var url = "https://bankapi123.herokuapp.com/card-info/add_card/${info[0]}";
     // print(url);
     Map data = {
       'cards_list': {
@@ -113,7 +113,7 @@ class CustomAPI extends API {
   }
 
   Future<http.Response> deleteCard(String id) async {
-    var url = "http://bankapi123.herokuapp.com/card-info/sai_cartao/$id";
+    var url = "https://bankapi123.herokuapp.com/card-info/sai_cartao/$id";
 
     var response = await http.delete(
       url,
@@ -132,7 +132,7 @@ class CustomAPI extends API {
     if (res.statusCode == 200 || res.statusCode == 201) {
       print("Deletado");
       var urlAdd =
-          "http://bankapi123.herokuapp.com/card-info/add_card/${info[0]}";
+          "https://bankapi123.herokuapp.com/card-info/add_card/${info[0]}";
       Map data = {
         'cards_list': {
           'name': info[1],
@@ -155,7 +155,7 @@ class CustomAPI extends API {
       if (response.statusCode == 200 || response.statusCode == 201) {
         print("SALDO ATUALIZADO");
         var urlAddFaturaDeb =
-            "http://bankapi123.herokuapp.com/card-info/Altera_fatura/${info[0]}";
+            "https://bankapi123.herokuapp.com/card-info/Altera_fatura/${info[0]}";
         Map opdata = {
           "card_fat": {
             "name_bank": opInfo[0],
